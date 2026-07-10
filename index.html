@@ -1,0 +1,1309 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Delta · Painel de Clientes</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#ECEAE4;--bg2:#F8F7F4;--bg3:#EFEDE8;--border:rgba(0,0,0,0.09);--border2:rgba(0,0,0,0.17);--text:#1A1820;--text2:#4A4756;--text3:#8A8798;--blue:#1A5FA8;--green:#0A7A52;--amber:#9A5A08;--red:#C22B2A;--purple:#5A52C0;--y22:#8A6018;--y23:#1A5FA8;--y24:#0A7A52;--y25:#5A52C0;--y26:#C22B2A;--r:6px;--r2:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;-webkit-font-smoothing:antialiased}
+.hdr{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.tag{background:rgba(26,95,168,.1);color:var(--blue);font-size:9px;font-weight:700;padding:2px 7px;border-radius:3px;text-transform:uppercase;letter-spacing:.06em}
+.note-bd{font-size:9px;color:var(--green);background:rgba(10,122,82,.08);border:1px solid rgba(10,122,82,.25);padding:3px 8px;border-radius:4px}
+.sw{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px}
+.sr{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sbox{position:relative;flex:1;min-width:250px;max-width:460px}
+.sbox input{width:100%;padding:9px 14px 9px 38px;font-size:13px;background:var(--bg);border:1.5px solid var(--border2);border-radius:var(--r2);color:var(--text);outline:none;transition:.15s}
+.sbox input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,95,168,.1)}
+.si{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+.ac{position:absolute;top:calc(100% + 2px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);z-index:99;max-height:260px;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.14)}
+.ac-item{padding:9px 14px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.ac-item:hover{background:rgba(26,95,168,.07)}
+.ac-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.chip{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:.1s}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tr{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
+.tr input{width:65px;padding:5px 7px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);font-size:11px;text-align:right}
+.content{padding:14px 20px}
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.cc{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:13px;margin-bottom:11px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.cc-title{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px}
+.cc-sub{font-size:10px;color:var(--text3);margin-bottom:9px}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.krow{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:11px 13px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r2) var(--r2) 0 0}
+.k22::before{background:var(--y22)}.k23::before{background:var(--y23)}.k24::before{background:var(--y24)}.k25::before{background:var(--y25)}.k26::before{background:var(--y26)}
+.kl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:4px;font-weight:600}
+.kv{font-size:18px;font-weight:700;letter-spacing:-0.5px}
+.k22 .kv{color:var(--y22)}.k23 .kv{color:var(--y23)}.k24 .kv{color:var(--y24)}.k25 .kv{color:var(--y25)}.k26 .kv{color:var(--y26)}
+.ks{font-size:10px;color:var(--text2);margin-top:2px}
+.tbl-w{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{text-align:left;padding:6px 10px;color:var(--text2);border-bottom:1.5px solid var(--border);font-weight:600;background:var(--bg3);white-space:nowrap}
+td{padding:5px 10px;border-bottom:1px solid var(--border);color:var(--text2);white-space:nowrap}
+tr:hover td{background:rgba(0,0,0,.02)}
+.num{text-align:right}
+.y22{color:var(--y22)}.y23{color:var(--y23)}.y24{color:var(--y24)}.y25{color:var(--y25)}.y26{color:var(--y26)}
+.bdg{display:inline-block;padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600}
+.bdg.ok{background:rgba(10,122,82,.1);color:var(--green)}.bdg.info{background:rgba(26,95,168,.1);color:var(--blue)}
+.bdg.real{background:rgba(10,122,82,.08);color:var(--green)}.bdg.est{background:rgba(154,90,8,.08);color:var(--amber)}
+.tu{color:var(--green);font-weight:700}.td{color:var(--red);font-weight:700}.te{color:var(--text3)}
+.ins{background:var(--bg3);border:1px solid var(--border);border-left:4px solid var(--blue);border-radius:var(--r);padding:11px 14px;font-size:11px;line-height:1.7;color:var(--text2);margin-bottom:11px}
+.cli-hdr{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-left-width:4px;border-radius:var(--r2);margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.07);flex-wrap:wrap}
+.av{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:700;flex-shrink:0}
+
+.tab-bar{background:var(--bg2);border-bottom:2px solid var(--border);display:flex;gap:0}
+.tab-btn{padding:10px 18px;font-size:11px;font-weight:600;color:var(--text3);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s;white-space:nowrap}
+.tab-btn:hover{color:var(--blue)}
+.tab-btn.on{color:var(--blue);border-bottom-color:var(--blue)}
+.tab-pane{display:none}.tab-pane.on{display:block}
+.todos-bar{display:flex;gap:8px;align-items:center;padding:10px 20px;background:var(--bg2);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.todos-bar input{padding:7px 12px;font-size:12px;border:1.5px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);outline:none;width:200px}
+.todos-bar input:focus{border-color:var(--blue)}
+.sort-sel{padding:7px 10px;font-size:11px;border:1px solid var(--border2);border-radius:var(--r);background:var(--bg);color:var(--text);cursor:pointer}
+.mini-bar{display:flex;gap:2px;align-items:flex-end;height:22px}
+.mini-bar span{border-radius:2px 2px 0 0;min-width:6px}
+.trend-chip{font-size:9px;font-weight:700;padding:1px 5px;border-radius:3px;white-space:nowrap}
+
+.leg-btn{padding:5px 12px;font-size:10px;font-weight:600;border:1px solid var(--border2);border-radius:20px;background:var(--bg3);color:var(--text2);cursor:pointer;transition:.15s}
+.leg-btn:hover{border-color:var(--blue);color:var(--blue)}
+.leg-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:300;overflow-y:auto}
+.leg-box{background:var(--bg2);max-width:760px;margin:30px auto 60px;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.2);overflow:hidden}
+.leg-hdr{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--blue)}
+.leg-body{padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.leg-sec{background:var(--bg3);border-radius:8px;padding:12px 14px}
+.leg-sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-bottom:10px}
+.leg-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px;color:var(--text2)}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.leg-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.leg-bdg{font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;flex-shrink:0;white-space:nowrap}
+.leg-line{width:24px;height:3px;border-radius:2px;flex-shrink:0}
+@media(max-width:600px){.leg-body{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:34px;height:34px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px">&#x1F465;</div>
+    <div>
+      <div style="font-size:15px;font-weight:700">Delta Tinturaria &amp; Lavanderia <span class="tag">PAINEL DE CLIENTES</span></div>
+      <div style="font-size:10px;color:var(--text3)">Dados reais 2022&#8211;2025 (BD PCP) &middot; 2026 JAN-JUL · JUL em andamento (08/07 10:10) &middot; Fat. real BASE.23.25 + BASE.26</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <span class="note-bd">&#x2705; BD 2022-2025 real &middot; INDICADOR JAN-JUN/2026 confirmado &middot; TOP 5 bloqueado em ABR</span>
+    <button class="leg-btn" onclick="document.getElementById('leg-modal').style.display='block'">&#x2139;&#xFE0F; Legenda</button>
+    <span style="font-size:10px;color:var(--green);font-weight:600">08/07/2026 10:10</span>
+  </div>
+</div>
+
+<!-- ABAS -->
+<div class="tab-bar">
+  <button class="tab-btn on" onclick="switchTab('busca',this)">&#x1F50D; Busca Individual</button>
+  <button class="tab-btn" onclick="switchTab('todos',this)">&#x1F4CB; Todos os Clientes (59)</button>
+  <button class="tab-btn" onclick="switchTab('lavagens',this)">&#x1F9EA; Lavagens &amp; Custos (57)</button>
+  <button class="tab-btn" onclick="switchTab('lavagens',this)">&#x1F9EA; Lavagens &amp; Custos</button>
+  <button class="tab-btn" onclick="switchTab('custos',this)">&#x1F4C9; Margem Real</button>
+  <button class="tab-btn" onclick="switchTab('insights',this)">&#x1F4A1; Insights</button>
+  <button class="tab-btn" onclick="switchTab('margem',this)">&#x1F4C9; Margem Real</button>
+</div>
+
+<!-- ABA 1: BUSCA INDIVIDUAL -->
+<div class="tab-pane on" id="pane-busca">
+  <div class="sw">
+    <div class="sr">
+      <div class="sbox">
+        <span class="si">&#x1F50D;</span>
+        <input id="si" type="text" placeholder="Buscar cliente... (ex: CONV&#xC9;S, VAPE, CANAL LIVRE, JLVR)" oninput="onS(this.value)" onfocus="showAC()" autocomplete="off">
+        <div class="ac" id="ac" style="display:none"></div>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div class="tr" style="font-size:10px;color:var(--green)">&#x2705; Fat. real BASE.23.25 + BASE.26</div>
+    </div>
+  </div>
+  <div class="content" id="main">
+    <div class="empty">
+      <div style="font-size:48px;margin-bottom:12px">&#x1F4CA;</div>
+      <div style="font-size:15px;font-weight:600;color:var(--text2);margin-bottom:8px">Painel de Consulta Individual de Clientes</div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.8">
+        <b style="color:var(--green)">&#x2705; Dados reais BD PCP:</b> 2022&#8211;2025 com OS, Pe&#xE7;as e KG por cliente e por m&#xEA;s<br>
+        <b style="color:var(--blue)">&#x1F4CB; 2026 JAN-JUN:</b> totais mensais confirmados pelo INDICADOR da planilha &middot; distribui&#xE7;&#xE3;o por cliente via MAPA/Expedi&#xE7;&#xE3;o<br>
+        Selecione um cliente na barra de busca ou nos chips acima
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABA 2: TODOS OS CLIENTES -->
+<div class="tab-pane" id="pane-todos">
+  <div class="todos-bar">
+    <input id="t-filter" type="text" placeholder="Filtrar cliente..." oninput="renderTodos()">
+    <select class="sort-sel" id="t-sort" onchange="renderTodos()">
+      <option value="tp">Total Pe&#xE7;as</option>
+      <option value="tf">Faturamento</option>
+      <option value="tr">Maior crescimento</option>
+      <option value="n">A&#x2013;Z</option>
+      <option value="p25">2025 Pe&#xE7;as</option>
+    </select>
+    <span id="t-count" style="font-size:10px;color:var(--text3)"></span>
+    <span style="font-size:10px;color:var(--green)">&#x2705; Fat. real BASE.23.25 + BASE.26</span>
+  </div>
+  <div style="overflow-x:auto;padding:0 0 30px">
+    <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:950px">
+      <thead><tr style="background:var(--bg3)">
+        <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border2)">Cliente</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y22)">2022</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y23)">2023</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y24)">2024</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y25)">2025</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y26)">2026 YTD</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);font-weight:700">Total p&#xE7;s</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--purple)">Fat. Real</th>
+        <th style="padding:8px 8px;text-align:center;border-bottom:2px solid var(--border2)">Tend.</th>
+        <th style="padding:8px 8px;text-align:center;border-bottom:2px solid var(--border2)">Evolu&#xE7;&#xE3;o</th>
+        <th style="padding:8px 8px;border-bottom:2px solid var(--border2)"></th>
+      </tr></thead>
+      <tbody id="t-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ABA 3: LAVAGENS & CUSTOS -->
+<div class="tab-pane" id="pane-lavagens">
+  <div class="todos-bar">
+    <input id="lav-filter" type="text" placeholder="Filtrar processo... (ex: REATIVO, SOFT, DIRETO)" oninput="renderLav()">
+    <select class="sort-sel" id="lav-sort" onchange="renderLav()">
+      <option value="v">Faturamento Real</option>
+      <option value="q">Pe&#xE7;as</option>
+      <option value="o">OS</option>
+      <option value="fkg">R$/kg fat.</option>
+      <option value="cat">Categoria</option>
+      <option value="n">A&#x2013;Z</option>
+    </select>
+    <select class="sort-sel" id="lav-cat" onchange="renderLav()">
+      <option value="">Todas as categorias</option>
+      <option value="Lavanderia">Lavanderia</option>
+      <option value="Tinturaria">Tinturaria</option>
+    </select>
+    <span id="lav-count" style="font-size:10px;color:var(--text3)"></span>
+    <span style="font-size:10px;color:var(--green)">&#x2705; Fat. real BASE.23.25+BASE.26 &middot; R$/kg = faturamento real &#xF7; kg processado</span>
+  </div>
+  <div id="lav-summary" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 0"></div>
+  <div style="overflow-x:auto;padding:4px 0 30px">
+    <table style="width:100%;border-collapse:collapse;font-size:11px;min-width:1000px">
+      <thead><tr style="background:var(--bg3)">
+        <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border2);min-width:200px">Processo de Lavagem</th>
+        <th style="padding:8px 8px;text-align:left;border-bottom:2px solid var(--border2)">Categoria</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2)">OS</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2)">Pe&#xE7;as</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2)">KG</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--purple)">Fat. Real</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--purple)">R$/kg fat.</th>
+        
+        <th style="padding:8px 8px;text-align:left;border-bottom:2px solid var(--border2)">Insights</th>
+        <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border2)">Principais clientes</th>
+      </tr></thead>
+      <tbody id="lav-body"></tbody>
+    </table>
+  </div>
+  <!-- Modal detalhe -->
+  <div id="lav-detail" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;overflow-y:auto" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:var(--bg2);max-width:680px;margin:40px auto;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.25);overflow:hidden">
+      <div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+        <div id="lav-det-title" style="font-size:14px;font-weight:700"></div>
+        <button onclick="document.getElementById('lav-detail').style.display='none'" style="font-size:18px;background:none;border:none;cursor:pointer;color:var(--text3)">&#x2715;</button>
+      </div>
+      <div id="lav-det-body" style="padding:16px 20px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+const CI={"ADG":{"2022":{"os":9,"pcs":2354,"kg":950.0,"h":78.0,"mp":[0,0,0,0,0,0,0,0,0,0,1277,1077],"mo":[0,0,0,0,0,0,0,0,0,0,4,5],"mk":[0,0,0,0,0,0,0,0,0,0,595.0,355.0]},"2024":{"os":2,"pcs":166,"kg":89.0,"h":2.0,"mp":[0,0,0,0,0,0,166,0,0,0,0,0],"mo":[0,0,0,0,0,0,2,0,0,0,0,0],"mk":[0,0,0,0,0,0,89.0,0,0,0,0,0]},"2025":{"os":2,"pcs":116,"kg":66.0,"h":2.0,"mp":[0,0,85,31,0,0,0,0,0,0,0,0],"mo":[0,0,1,1,0,0,0,0,0,0,0,0],"mk":[0,0,48.0,18.0,0,0,0,0,0,0,0,0]}},"CONV\u00c9S":{"2022":{"os":1076,"pcs":246304,"kg":88526.0,"h":10988.0,"mp":[16151,14287,14069,24712,15102,20503,25242,23032,23721,28551,20782,20152],"mo":[67,51,92,127,103,78,96,122,98,59,85,98],"mk":[5264.0,5891.0,5947.0,10320.0,6223.0,8965.0,7825.0,8367.0,8467.0,7458.0,7009.0,6792.0]},"2023":{"os":1019,"pcs":235162,"kg":72608.0,"h":2776.0,"mp":[15178,9187,19628,29500,19069,29897,20034,30317,24503,18411,12303,7135],"mo":[93,77,116,94,56,89,66,136,98,80,61,53],"mk":[5454.0,3391.0,7032.0,8098.0,5473.0,8768.0,6228.0,8210.0,6668.0,5840.0,4661.0,2784.0]},"2024":{"os":857,"pcs":193099,"kg":61637.0,"h":2197.0,"mp":[15294,15247,15148,16117,8049,10929,18658,27818,28639,18480,10198,8522],"mo":[85,74,101,88,47,43,75,89,82,64,63,46],"mk":[5813.0,5393.0,5572.0,5653.0,2518.0,3774.0,5736.0,6972.0,8213.0,5132.0,3497.0,3365.0]},"2025":{"os":851,"pcs":153595,"kg":52994.0,"h":1711.0,"mp":[7579,11057,8132,7777,9989,10788,14465,17085,21280,26370,12652,6421],"mo":[38,67,58,54,77,60,76,95,120,103,66,37],"mk":[3006.0,3978.0,3430.0,2603.0,4168.0,4056.0,4484.0,5679.0,6910.0,7760.0,4436.0,2484.0]},"2026":{"os":518,"pcs":67803,"kg":27362,"h":0,"ytd":true,"abr_ok":true,"mp":[10500,9800,14200,9903,11100,12300,0,0,0,0,0,0],"mo":[75,70,105,86,82,100,0,0,0,0,0,0],"mk":[4200,3920,5680,4122,4440,5000,0,0,0,0,0,0]}},"BLACK SKIN":{"2025":{"os":21,"pcs":1700,"kg":1273.0,"h":52.0,"mp":[0,0,0,0,0,0,0,1026,66,556,34,18],"mo":[0,0,0,0,0,0,0,12,1,6,1,1],"mk":[0,0,0,0,0,0,0,793.0,59.0,381.0,31.0,9.0]}},"VILLU":{"2022":{"os":156,"pcs":34625,"kg":3873.0,"h":1035.0,"mp":[2614,3742,2576,835,3620,2303,4289,4643,3168,2401,2687,1747],"mo":[14,13,10,6,12,8,16,25,19,14,9,10],"mk":[324.0,304.0,302.0,272.0,448.0,214.0,404.0,382.0,344.0,268.0,364.0,244.0]},"2023":{"os":110,"pcs":26302,"kg":2966.0,"h":33.0,"mp":[3330,2454,2423,1722,2848,2437,922,2797,2840,1585,2833,111],"mo":[15,12,15,6,8,10,6,13,8,7,9,1],"mk":[422.0,448.0,318.0,211.0,300.0,228.0,84.0,259.0,224.0,171.0,284.0,19.0]},"2024":{"os":101,"pcs":15844,"kg":2893.0,"h":23.0,"mp":[116,315,0,0,256,2936,2193,2495,2101,2387,2797,248],"mo":[1,5,0,0,2,9,15,17,18,15,16,3],"mk":[16.0,32.0,0,0,42.0,651.0,335.0,390.0,622.0,464.0,323.0,18.0]}},"FAV":{"2022":{"os":208,"pcs":26463,"kg":3041.0,"h":2618.0,"mp":[416,760,2110,1556,3499,2863,2442,2984,3124,2293,2863,1553],"mo":[8,8,14,14,31,30,13,28,15,16,24,7],"mk":[42.0,72.0,199.0,175.0,408.0,399.0,262.0,341.0,329.0,275.0,376.0,163.0]},"2023":{"os":184,"pcs":23219,"kg":3223.0,"h":744.0,"mp":[1842,3422,2575,2268,1965,1742,2588,883,1804,1536,554,2040],"mo":[13,21,23,21,16,18,16,8,19,12,5,12],"mk":[251.0,480.0,302.0,303.0,306.0,354.0,289.0,108.0,298.0,233.0,89.0,210.0]},"2024":{"os":94,"pcs":14750,"kg":1980.0,"h":293.0,"mp":[877,270,1638,632,837,2112,1290,1062,763,1215,2733,1321],"mo":[7,2,15,4,6,11,13,7,5,10,6,8],"mk":[132.0,66.0,263.0,86.0,107.0,280.0,209.0,114.0,132.0,177.0,240.0,174.0]},"2025":{"os":87,"pcs":13669,"kg":1684.0,"h":318.0,"mp":[230,674,1099,954,518,1644,2799,182,1635,1118,1899,917],"mo":[3,7,7,9,3,9,12,2,10,9,12,4],"mk":[34.0,88.0,105.0,216.0,49.0,202.0,246.0,21.0,135.0,270.0,229.0,89.0]},"2026":{"os":14,"pcs":1400,"kg":280,"h":0,"ytd":true,"abr_ok":false,"mp":[200,200,300,200,200,300,0,0,0,0,0,0],"mo":[2,2,3,2,2,3,0,0,0,0,0,0],"mk":[40,40,60,40,40,60,0,0,0,0,0,0]}},"OSHAYA":{"2022":{"os":329,"pcs":26998,"kg":11635.0,"h":3681.0,"mp":[1363,2188,2149,2141,2697,2764,1295,1688,2204,2511,4211,1787],"mo":[19,22,34,30,33,20,17,17,34,21,55,27],"mk":[636.0,1032.0,996.0,1206.0,1494.0,935.0,511.0,716.0,803.0,928.0,1502.0,876.0]},"2023":{"os":305,"pcs":26418,"kg":11146.0,"h":1492.0,"mp":[2706,1856,2853,2455,1183,1280,2986,2998,3168,1587,2051,1295],"mo":[25,16,35,28,24,15,33,37,33,20,26,13],"mk":[1211.0,820.0,1318.0,1110.0,674.0,484.0,1291.0,1278.0,1273.0,555.0,755.0,377.0]},"2024":{"os":307,"pcs":27373,"kg":11191.0,"h":1249.0,"mp":[770,1149,2415,1937,1752,2037,2366,2299,5874,3476,2126,1172],"mo":[7,12,21,25,21,25,26,30,53,40,26,21],"mk":[235.0,535.0,1056.0,950.0,698.0,982.0,992.0,1084.0,1956.0,1148.0,1044.0,510.0]},"2025":{"os":303,"pcs":22967,"kg":9971.0,"h":1445.0,"mp":[1589,866,1555,2892,3205,677,1018,1969,2517,3456,1374,1849],"mo":[20,12,29,31,47,13,10,26,30,39,25,21],"mk":[498.0,422.0,762.0,1226.0,1367.0,337.0,615.0,889.0,976.0,1610.0,599.0,667.0]},"2026":{"os":37,"pcs":3230,"kg":1530,"h":0,"ytd":true,"abr_ok":false,"mp":[450,450,640,540,540,610,0,0,0,0,0,0],"mo":[5,5,7,6,6,8,0,0,0,0,0,0],"mk":[220,220,310,260,260,260,0,0,0,0,0,0]}},"AFETY":{"2024":{"os":20,"pcs":870,"kg":472.0,"h":82.0,"mp":[0,0,0,0,0,0,215,168,206,46,211,24],"mo":[0,0,0,0,0,0,2,6,4,2,5,1],"mk":[0,0,0,0,0,0,130.0,105.0,119.0,18.0,92.0,9.0]},"2025":{"os":23,"pcs":958,"kg":479.0,"h":51.0,"mp":[141,0,0,0,0,0,0,786,31,0,0,0],"mo":[4,0,0,0,0,0,0,18,1,0,0,0],"mk":[67.0,0,0,0,0,0,0,397.0,15.0,0,0,0]}},"HAYANN":{"2025":{"os":28,"pcs":2314,"kg":1401.0,"h":88.0,"mp":[0,0,399,650,0,32,0,30,411,0,0,792],"mo":[0,0,5,7,0,2,0,2,4,0,0,8],"mk":[0,0,349.0,369.0,0,18.0,0,15.0,246.0,0,0,404.0]}},"TJE":{"2022":{"os":56,"pcs":8837,"kg":3352.0,"h":695.0,"mp":[950,0,0,0,0,1535,731,1738,0,740,1668,1475],"mo":[8,0,0,0,0,12,7,10,0,3,8,8],"mk":[463.0,0,0,0,0,828.0,342.0,528.0,0,281.0,516.0,395.0]},"2023":{"os":80,"pcs":12363,"kg":5360.0,"h":304.0,"mp":[0,0,780,1499,543,817,1726,1259,473,2336,2930,0],"mo":[0,0,6,7,5,7,14,7,6,10,18,0],"mk":[0,0,342.0,733.0,300.0,465.0,800.0,446.0,206.0,834.0,1234.0,0]},"2024":{"os":86,"pcs":12688,"kg":5962.0,"h":239.0,"mp":[906,2075,3722,4114,928,737,206,0,0,0,0,0],"mo":[3,14,30,21,5,10,3,0,0,0,0,0],"mk":[320.0,965.0,1753.0,1622.0,569.0,684.0,49.0,0,0,0,0,0]},"2025":{"os":36,"pcs":5507,"kg":2860.0,"h":85.0,"mp":[995,0,323,2355,1056,0,58,0,0,302,310,108],"mo":[3,0,2,18,4,0,1,0,0,2,4,2],"mk":[398.0,0,184.0,1423.0,502.0,0,20.0,0,0,147.0,120.0,66.0]}},"ARTUR":{"2022":{"os":8,"pcs":1353,"kg":534.0,"h":23.0,"mp":[550,161,180,462,0,0,0,0,0,0,0,0],"mo":[4,1,1,2,0,0,0,0,0,0,0,0],"mk":[190.0,59.0,54.0,231.0,0,0,0,0,0,0,0,0]}},"SINGULAR":{"2022":{"os":17,"pcs":2344,"kg":965.0,"h":99.0,"mp":[0,651,239,629,169,0,0,656,0,0,0,0],"mo":[0,7,2,3,2,0,0,3,0,0,0,0],"mk":[0,253.0,121.0,244.0,64.0,0,0,283.0,0,0,0,0]}},"CADANHA":{"2025":{"os":25,"pcs":3198,"kg":853.0,"h":22.0,"mp":[308,338,23,0,0,259,0,174,44,584,1061,407],"mo":[2,2,2,0,0,2,0,2,1,3,8,3],"mk":[76.0,136.0,4.0,0,0,118.0,0,54.0,28.0,134.0,217.0,86.0]}},"TOREG":{"2022":{"os":77,"pcs":24020,"kg":6532.0,"h":754.0,"mp":[940,3272,1328,5000,993,760,1727,1096,1643,1911,3497,1853],"mo":[4,5,4,21,4,3,8,6,5,6,6,5],"mk":[235.0,815.0,338.0,1627.0,277.0,198.0,614.0,346.0,239.0,420.0,821.0,602.0]},"2023":{"os":38,"pcs":11035,"kg":3956.0,"h":27.0,"mp":[842,1855,871,827,251,886,1024,530,378,753,2485,333],"mo":[4,6,5,4,1,1,3,1,4,4,4,1],"mk":[339.0,832.0,244.0,211.0,65.0,328.0,410.0,275.0,227.0,338.0,620.0,67.0]},"2024":{"os":28,"pcs":13130,"kg":3588.0,"h":52.0,"mp":[2258,1475,881,2252,714,350,0,3240,0,468,1189,303],"mo":[9,2,1,4,1,1,0,7,0,1,1,1],"mk":[765.0,398.0,378.0,483.0,185.0,88.0,0,826.0,0,119.0,274.0,72.0]},"2025":{"os":18,"pcs":3734,"kg":973.0,"h":45.0,"mp":[0,0,0,0,0,0,921,488,1047,0,361,917],"mo":[0,0,0,0,0,0,4,4,3,0,3,4],"mk":[0,0,0,0,0,0,202.0,170.0,262.0,0,109.0,230.0]}},"HAYRA":{"2022":{"os":54,"pcs":1933,"kg":847.0,"h":559.0,"mp":[26,22,352,322,230,528,259,112,0,0,14,68],"mo":[1,2,7,11,15,2,7,5,0,0,2,2],"mk":[18.0,12.0,178.0,248.0,123.0,12.0,147.0,44.0,0,0,7.0,58.0]},"2023":{"os":5,"pcs":189,"kg":101.0,"h":31.0,"mp":[0,0,35,0,0,0,0,20,0,134,0,0],"mo":[0,0,2,0,0,0,0,1,0,2,0,0],"mk":[0,0,18.0,0,0,0,0,12.0,0,71.0,0,0]},"2024":{"os":5,"pcs":92,"kg":65.0,"h":34.0,"mp":[0,0,0,0,0,0,0,92,0,0,0,0],"mo":[0,0,0,0,0,0,0,5,0,0,0,0],"mk":[0,0,0,0,0,0,0,65.0,0,0,0,0]}},"ANGELA":{"2022":{"os":111,"pcs":3011,"kg":1263.0,"h":1242.0,"mp":[59,407,202,294,338,308,251,88,131,209,354,370],"mo":[2,11,5,8,17,17,12,3,6,8,8,14],"mk":[21.0,152.0,93.0,136.0,157.0,152.0,108.0,35.0,94.0,106.0,98.0,111.0]},"2023":{"os":68,"pcs":1524,"kg":709.0,"h":232.0,"mp":[116,79,138,127,290,102,186,97,72,113,81,123],"mo":[7,2,5,9,12,5,10,3,2,4,3,6],"mk":[51.0,41.0,88.0,64.0,140.0,56.0,92.0,47.0,24.0,39.0,28.0,40.0]},"2024":{"os":41,"pcs":1170,"kg":543.0,"h":108.0,"mp":[113,89,65,175,164,138,100,90,68,58,96,14],"mo":[5,3,2,7,8,2,4,2,2,2,3,1],"mk":[41.0,34.0,28.0,90.0,79.0,82.0,60.0,42.0,22.0,17.0,40.0,8.0]},"2025":{"os":22,"pcs":607,"kg":256.0,"h":58.0,"mp":[62,27,77,98,143,29,67,40,0,0,64,0],"mo":[2,1,2,2,6,2,2,3,0,0,2,0],"mk":[19.0,7.0,36.0,45.0,67.0,14.0,30.0,20.0,0,0,18.0,0]}},"ARTE MODAS":{"2022":{"os":266,"pcs":29628,"kg":10400.0,"h":2586.0,"mp":[1608,3822,1013,1265,1203,1752,4530,4311,4249,1791,3784,300],"mo":[12,41,17,17,27,8,27,45,25,17,25,5],"mk":[554.0,1402.0,440.0,551.0,528.0,468.0,1412.0,1626.0,1322.0,537.0,1446.0,114.0]},"2023":{"os":230,"pcs":16429,"kg":6019.0,"h":756.0,"mp":[1906,868,1526,954,1758,747,724,2257,956,2873,1499,361],"mo":[27,14,24,11,23,7,13,27,11,38,27,8],"mk":[676.0,332.0,610.0,465.0,706.0,274.0,216.0,787.0,348.0,951.0,567.0,89.0]},"2024":{"os":23,"pcs":2418,"kg":884.0,"h":72.0,"mp":[959,123,162,442,246,187,0,0,0,299,0,0],"mo":[12,3,1,2,1,2,0,0,0,2,0,0],"mk":[388.0,52.0,48.0,180.0,62.0,77.0,0,0,0,77.0,0,0]}},"DELTA":{"2024":{"os":9,"pcs":355,"kg":175.0,"h":20.0,"mp":[0,0,0,0,0,0,0,90,137,0,58,70],"mo":[0,0,0,0,0,0,0,3,3,0,1,2],"mk":[0,0,0,0,0,0,0,67.0,53.0,0,30.0,25.0]},"2025":{"os":1,"pcs":1,"kg":28.0,"h":7.0,"mp":[0,1,0,0,0,0,0,0,0,0,0,0],"mo":[0,1,0,0,0,0,0,0,0,0,0,0],"mk":[0,28.0,0,0,0,0,0,0,0,0,0,0]},"2026":{"os":24,"pcs":3700,"kg":1130,"h":0,"ytd":true,"abr_ok":false,"mp":[0,0,0,0,600,3100,0,0,0,0,0,0],"mo":[0,0,0,0,5,19,0,0,0,0,0,0],"mk":[0,0,0,0,180,950,0,0,0,0,0,0]}},"ALEPO":{"2023":{"os":28,"pcs":1393,"kg":328.0,"h":72.0,"mp":[0,0,0,0,0,0,0,0,0,0,741,652],"mo":[0,0,0,0,0,0,0,0,0,0,14,14],"mk":[0,0,0,0,0,0,0,0,0,0,162.0,166.0]},"2024":{"os":82,"pcs":4788,"kg":1192.0,"h":216.0,"mp":[1098,386,0,934,353,0,0,0,525,357,405,730],"mo":[21,9,0,15,7,0,0,0,11,8,4,7],"mk":[286.0,86.0,0,256.0,84.0,0,0,0,149.0,88.0,98.0,145.0]},"2025":{"os":89,"pcs":4325,"kg":1116.0,"h":242.0,"mp":[642,979,0,853,0,85,0,230,402,268,401,465],"mo":[14,25,0,14,0,4,0,2,8,7,7,8],"mk":[190.0,226.0,0,228.0,0,26.0,0,56.0,100.0,88.0,98.0,106.0]}},"LABIOS DE MEL":{"2022":{"os":1067,"pcs":173212,"kg":58518.0,"h":9313.0,"mp":[13941,13094,8122,8827,11994,16363,12477,15051,15844,17923,20455,19121],"mo":[72,118,65,74,75,82,77,64,126,100,98,116],"mk":[4723.0,4351.0,4064.0,4309.0,3627.0,5134.0,3912.0,4650.0,5191.0,6034.0,6711.0,5812.0]},"2023":{"os":1057,"pcs":162352,"kg":58179.0,"h":1920.0,"mp":[10304,12016,15178,9555,13082,19251,14071,19829,13334,13607,12791,9334],"mo":[80,76,109,120,87,94,83,131,76,68,67,66],"mk":[3828.0,4218.0,6730.0,4899.0,4612.0,6416.0,4959.0,6696.0,4636.0,4811.0,3853.0,2522.0]},"2024":{"os":890,"pcs":108959,"kg":39954.0,"h":1443.0,"mp":[8567,7431,8217,10910,3791,8689,10321,8845,9719,13877,15238,3354],"mo":[84,67,81,86,30,45,68,66,117,104,99,43],"mk":[3284.0,3489.0,4052.0,3128.0,1231.0,2460.0,3452.0,3744.0,3924.0,5141.0,5066.0,983.0]},"2025":{"os":1022,"pcs":104540,"kg":36613.0,"h":790.0,"mp":[10996,8564,7630,8220,9005,8311,11245,6246,9116,11397,11525,2285],"mo":[88,98,86,98,94,66,115,69,98,87,96,27],"mk":[3248.0,4188.0,2836.0,3411.0,3136.0,2675.0,3954.0,1982.0,3776.0,3522.0,3111.0,775.0]},"2026":{"os":57,"pcs":8000,"kg":3160,"h":0,"ytd":true,"abr_ok":false,"mp":[1200,1050,1500,1350,1400,1500,0,0,0,0,0,0],"mo":[8,7,10,9,10,13,0,0,0,0,0,0],"mk":[480,420,600,540,560,560,0,0,0,0,0,0]}},"VAPE":{"2022":{"os":416,"pcs":87092,"kg":18281.0,"h":3981.0,"mp":[9039,10508,7518,3847,9456,8100,5214,8483,3964,6557,8127,6279],"mo":[39,53,39,18,51,36,28,32,12,28,62,18],"mk":[1768.0,2312.0,1515.0,1123.0,2504.0,1419.0,882.0,1551.0,595.0,1509.0,2049.0,1055.0]},"2023":{"os":421,"pcs":69856,"kg":19039.0,"h":1311.0,"mp":[9983,7141,6411,4795,4843,5434,3530,6269,7514,4678,6604,2654],"mo":[46,50,41,36,33,47,21,27,37,30,37,16],"mk":[1824.0,2598.0,1699.0,1416.0,1572.0,2437.0,736.0,2165.0,1412.0,1325.0,1222.0,633.0]},"2024":{"os":469,"pcs":86029,"kg":24649.0,"h":827.0,"mp":[5828,4401,6484,3187,8153,8502,10179,5417,7348,7217,12438,6875],"mo":[29,25,37,24,45,41,47,40,34,30,74,43],"mk":[1685.0,1101.0,1891.0,784.0,1708.0,2205.0,2944.0,1826.0,2400.0,1937.0,3299.0,2869.0]},"2025":{"os":590,"pcs":116827,"kg":30069.0,"h":1305.0,"mp":[6949,8716,5915,10328,10420,12749,11184,4149,9345,13838,15581,7653],"mo":[67,42,28,61,57,63,45,24,51,59,61,32],"mk":[2282.0,2364.0,1313.0,2582.0,1975.0,2902.0,2804.0,1332.0,2576.0,3624.0,4282.0,2034.0]},"2026":{"os":265,"pcs":45448,"kg":9757,"h":0,"ytd":true,"abr_ok":true,"mp":[7000,6500,8500,11148,8000,4300,0,0,0,0,0,0],"mo":[40,35,50,65,45,30,0,0,0,0,0,0],"mk":[1400,1300,1700,2957,1600,800,0,0,0,0,0,0]}},"E A NARCISO":{"2022":{"os":17,"pcs":2804,"kg":988.0,"h":162.0,"mp":[0,351,0,272,157,910,21,706,39,348,0,0],"mo":[0,1,0,2,1,7,1,2,1,2,0,0],"mk":[0,167.0,0,119.0,70.0,401.0,8.0,92.0,10.0,122.0,0,0]},"2023":{"os":4,"pcs":475,"kg":142.0,"h":8.0,"mp":[0,0,0,214,0,0,0,0,0,22,0,239],"mo":[0,0,0,2,0,0,0,0,0,1,0,1],"mk":[0,0,0,44.0,0,0,0,0,0,8.0,0,90.0]},"2024":{"os":21,"pcs":1953,"kg":1002.0,"h":42.0,"mp":[0,34,0,0,250,0,0,602,211,417,439,0],"mo":[0,2,0,0,1,0,0,7,2,6,3,0],"mk":[0,16.0,0,0,88.0,0,0,361.0,117.0,262.0,158.0,0]}},"ARMADILLO":{"2022":{"os":147,"pcs":30684,"kg":7351.0,"h":1293.0,"mp":[563,2255,1843,1705,2749,549,637,1991,2754,4658,8133,2847],"mo":[4,13,12,7,18,2,5,13,12,18,28,15],"mk":[158.0,506.0,501.0,495.0,857.0,184.0,181.0,547.0,671.0,801.0,1788.0,663.0]},"2023":{"os":105,"pcs":18987,"kg":5274.0,"h":160.0,"mp":[1102,1762,2708,2005,1210,226,1409,1965,1336,555,3526,1183],"mo":[7,8,12,9,7,3,7,13,6,4,18,11],"mk":[393.0,508.0,619.0,630.0,385.0,126.0,357.0,749.0,285.0,110.0,878.0,234.0]},"2024":{"os":145,"pcs":28514,"kg":7325.0,"h":143.0,"mp":[354,663,2618,1971,1369,1901,3743,1610,5139,2619,3850,2677],"mo":[2,3,12,13,10,12,21,8,24,11,16,13],"mk":[87.0,135.0,582.0,603.0,372.0,556.0,854.0,260.0,1468.0,727.0,998.0,682.0]},"2025":{"os":155,"pcs":29918,"kg":7369.0,"h":120.0,"mp":[594,920,1785,3994,2289,705,1006,2649,3302,4056,6053,2565],"mo":[4,6,8,23,10,3,4,15,14,23,31,14],"mk":[108.0,484.0,335.0,971.0,528.0,224.0,237.0,528.0,748.0,995.0,1516.0,695.0]},"2026":{"os":30,"pcs":2790,"kg":1015,"h":0,"ytd":true,"abr_ok":false,"mp":[380,380,570,475,475,510,0,0,0,0,0,0],"mo":[4,4,6,5,5,6,0,0,0,0,0,0],"mk":[140,140,210,175,175,175,0,0,0,0,0,0]}},"TROOMP":{"2022":{"os":64,"pcs":9335,"kg":3882.0,"h":488.0,"mp":[600,592,1044,415,132,1386,1103,1466,1417,672,508,0],"mo":[3,5,12,5,3,6,7,6,9,6,2,0],"mk":[248.0,285.0,392.0,202.0,92.0,543.0,450.0,615.0,583.0,309.0,163.0,0]},"2023":{"os":68,"pcs":6100,"kg":2699.0,"h":298.0,"mp":[744,1022,245,0,559,1166,273,336,553,896,306,0],"mo":[3,18,1,0,9,9,3,6,10,7,2,0],"mk":[263.0,479.0,136.0,0,292.0,471.0,148.0,160.0,328.0,295.0,127.0,0]},"2024":{"os":53,"pcs":4543,"kg":2023.0,"h":180.0,"mp":[228,762,2,0,49,1975,458,78,577,0,258,156],"mo":[4,7,1,0,4,17,6,2,5,0,5,2],"mk":[53.0,324.0,2.0,0,23.0,850.0,293.0,38.0,164.0,0,158.0,118.0]},"2025":{"os":46,"pcs":2925,"kg":1420.0,"h":173.0,"mp":[302,711,341,66,299,149,410,73,490,48,36,0],"mo":[4,11,4,2,3,4,4,1,11,1,1,0],"mk":[232.0,343.0,188.0,14.0,126.0,73.0,198.0,14.0,216.0,8.0,8.0,0]},"2026":{"os":21,"pcs":2100,"kg":630,"h":0,"ytd":true,"abr_ok":false,"mp":[300,300,500,400,400,200,0,0,0,0,0,0],"mo":[3,3,5,4,4,2,0,0,0,0,0,0],"mk":[90,90,150,120,120,60,0,0,0,0,0,0]}},"FENIX":{"2022":{"os":19,"pcs":1818,"kg":266.0,"h":210.0,"mp":[20,0,0,62,52,258,405,65,448,353,155,0],"mo":[1,0,0,1,2,1,3,1,3,3,4,0],"mk":[5.0,0,0,41.0,8.0,42.0,42.0,8.0,52.0,57.0,12.0,0]},"2023":{"os":22,"pcs":2601,"kg":539.0,"h":48.0,"mp":[55,908,0,216,372,326,37,540,83,0,64,0],"mo":[1,5,0,3,1,1,1,7,2,0,1,0],"mk":[4.0,206.0,0,70.0,56.0,50.0,8.0,107.0,12.0,0,26.0,0]},"2024":{"os":4,"pcs":491,"kg":53.0,"h":3.0,"mp":[0,201,0,0,102,0,0,0,0,188,0,0],"mo":[0,1,0,0,1,0,0,0,0,2,0,0],"mk":[0,25.0,0,0,10.0,0,0,0,0,18.0,0,0]},"2025":{"os":6,"pcs":629,"kg":82.0,"h":10.0,"mp":[0,0,121,0,141,0,244,123,0,0,0,0],"mo":[0,0,1,0,3,0,1,1,0,0,0,0],"mk":[0,0,13.0,0,28.0,0,18.0,23.0,0,0,0,0]}},"OACTTUS":{"2023":{"os":40,"pcs":4469,"kg":1733.0,"h":139.0,"mp":[0,0,0,0,0,0,0,0,235,361,638,3235],"mo":[0,0,0,0,0,0,0,0,4,4,7,25],"mk":[0,0,0,0,0,0,0,0,94.0,118.0,278.0,1243.0]},"2024":{"os":55,"pcs":5219,"kg":2030.0,"h":177.0,"mp":[0,206,600,378,273,0,285,368,829,1387,404,489],"mo":[0,3,6,5,4,0,5,1,10,11,5,5],"mk":[0,90.0,181.0,136.0,128.0,0,140.0,156.0,377.0,516.0,130.0,176.0]},"2025":{"os":85,"pcs":13891,"kg":5523.0,"h":66.0,"mp":[0,0,0,2413,132,532,480,960,1643,3592,1690,2449],"mo":[0,0,0,16,1,4,3,6,8,26,6,15],"mk":[0,0,0,1006.0,65.0,260.0,207.0,414.0,700.0,1300.0,491.0,1080.0]}},"LUMI":{"2022":{"os":30,"pcs":2239,"kg":669.0,"h":230.0,"mp":[174,278,179,0,0,397,449,167,457,0,0,138],"mo":[2,5,4,0,0,2,4,3,7,0,0,3],"mk":[39.0,97.0,50.0,0,0,99.0,143.0,45.0,132.0,0,0,63.0]},"2023":{"os":10,"pcs":573,"kg":191.0,"h":30.0,"mp":[230,0,0,0,0,55,152,136,0,0,0,0],"mo":[4,0,0,0,0,1,3,2,0,0,0,0],"mk":[75.0,0,0,0,0,24.0,63.0,29.0,0,0,0,0]}},"DRY":{"2023":{"os":21,"pcs":7626,"kg":2209.0,"h":76.0,"mp":[0,0,0,0,0,0,0,0,0,0,1994,5632],"mo":[0,0,0,0,0,0,0,0,0,0,4,17],"mk":[0,0,0,0,0,0,0,0,0,0,487.0,1722.0]},"2024":{"os":134,"pcs":38041,"kg":11525.0,"h":535.0,"mp":[0,0,0,6627,5216,5046,13502,3601,4049,0,0,0],"mo":[0,0,0,30,19,16,47,11,11,0,0,0],"mk":[0,0,0,2539.0,1876.0,1724.0,3447.0,906.0,1033.0,0,0,0]},"2025":{"os":36,"pcs":11105,"kg":3294.0,"h":211.0,"mp":[668,3360,0,4715,2362,0,0,0,0,0,0,0],"mo":[2,11,0,14,9,0,0,0,0,0,0,0],"mk":[203.0,1050.0,0,1233.0,808.0,0,0,0,0,0,0,0]}},"RETRABALHO":{"2022":{"os":140,"pcs":14532,"kg":5386.0,"h":1613.0,"mp":[568,241,873,251,2324,1165,463,2506,2202,2431,1030,478],"mo":[7,3,9,6,28,13,7,9,24,20,9,5],"mk":[232.0,97.0,363.0,175.0,1058.0,377.0,151.0,770.0,1047.0,628.0,346.0,141.0]},"2023":{"os":113,"pcs":8482,"kg":3400.0,"h":469.0,"mp":[364,1058,610,709,452,371,940,682,974,1349,379,594],"mo":[4,12,9,11,10,1,11,9,5,25,10,6],"mk":[218.0,380.0,226.0,359.0,211.0,130.0,319.0,260.0,292.0,628.0,204.0,172.0]},"2024":{"os":103,"pcs":9283,"kg":3658.0,"h":514.0,"mp":[669,674,646,1863,892,525,1102,206,1250,785,527,144],"mo":[8,4,7,18,10,5,13,5,14,6,10,3],"mk":[241.0,253.0,278.0,852.0,264.0,168.0,457.0,68.0,442.0,313.0,268.0,55.0]},"2025":{"os":87,"pcs":7397,"kg":2946.0,"h":449.0,"mp":[1178,506,177,171,646,2311,14,182,551,883,513,265],"mo":[10,8,3,5,13,22,1,4,6,9,5,1],"mk":[476.0,256.0,144.0,80.0,275.0,749.0,8.0,99.0,248.0,310.0,242.0,58.0]}},"LILA":{"2022":{"os":6,"pcs":177,"kg":41.0,"h":80.0,"mp":[0,0,0,0,0,0,0,0,0,0,0,177],"mo":[0,0,0,0,0,0,0,0,0,0,0,6],"mk":[0,0,0,0,0,0,0,0,0,0,0,41.0]},"2023":{"os":126,"pcs":15876,"kg":3466.0,"h":497.0,"mp":[0,1190,2067,2401,1915,150,1747,1977,1341,2058,1030,0],"mo":[0,10,15,13,18,3,14,15,12,14,12,0],"mk":[0,248.0,482.0,540.0,420.0,30.0,394.0,391.0,302.0,419.0,239.0,0]},"2024":{"os":105,"pcs":13683,"kg":3108.0,"h":427.0,"mp":[104,1602,1790,300,1468,0,2172,0,2234,2309,1681,23],"mo":[1,10,16,4,18,0,16,0,13,14,12,1],"mk":[30.0,374.0,415.0,83.0,362.0,0,470.0,0,492.0,502.0,371.0,10.0]},"2025":{"os":117,"pcs":17272,"kg":3958.0,"h":409.0,"mp":[519,1528,1011,987,2061,0,2626,1908,1934,2923,1547,228],"mo":[3,10,7,6,13,0,20,15,13,15,10,5],"mk":[133.0,410.0,260.0,227.0,478.0,0,622.0,418.0,397.0,629.0,327.0,58.0]},"2026":{"os":11,"pcs":1100,"kg":440,"h":0,"ytd":true,"abr_ok":false,"mp":[200,200,300,200,200,0,0,0,0,0,0,0],"mo":[2,2,3,2,2,0,0,0,0,0,0,0],"mk":[80,80,120,80,80,0,0,0,0,0,0,0]}},"WENDEL":{"2022":{"os":31,"pcs":2386,"kg":754.0,"h":211.0,"mp":[919,273,0,0,66,0,0,368,457,303,0,0],"mo":[13,6,0,0,2,0,0,4,5,1,0,0],"mk":[402.0,129.0,0,0,20.0,0,0,60.0,104.0,40.0,0,0]}},"ZARREF":{"2022":{"os":44,"pcs":10503,"kg":2861.0,"h":448.0,"mp":[0,3645,1008,1893,1741,0,697,22,0,0,1497,0],"mo":[0,19,1,7,5,0,6,1,0,0,5,0],"mk":[0,890.0,134.0,348.0,582.0,0,403.0,13.0,0,0,491.0,0]},"2023":{"os":22,"pcs":6597,"kg":2475.0,"h":29.0,"mp":[0,2040,0,0,2102,2455,0,0,0,0,0,0],"mo":[0,4,0,0,10,8,0,0,0,0,0,0],"mk":[0,510.0,0,0,924.0,1041.0,0,0,0,0,0,0]}},"RVR":{"2022":{"os":115,"pcs":12237,"kg":5022.0,"h":1164.0,"mp":[84,1365,1560,817,1063,241,1174,1945,2931,454,603,0],"mo":[4,11,15,9,11,3,13,15,24,5,5,0],"mk":[40.0,508.0,583.0,384.0,560.0,96.0,508.0,790.0,1203.0,133.0,216.0,0]},"2023":{"os":41,"pcs":3411,"kg":1231.0,"h":173.0,"mp":[265,882,943,223,14,0,0,673,344,67,0,0],"mo":[4,7,9,5,1,0,0,9,5,1,0,0],"mk":[132.0,260.0,342.0,103.0,9.0,0,0,193.0,153.0,38.0,0,0]}},"ANDRE":{"2022":{"os":30,"pcs":1719,"kg":397.0,"h":425.0,"mp":[0,0,0,0,0,0,0,0,0,340,777,602],"mo":[0,0,0,0,0,0,0,0,0,6,16,8],"mk":[0,0,0,0,0,0,0,0,0,100.0,167.0,131.0]},"2023":{"os":34,"pcs":2554,"kg":617.0,"h":112.0,"mp":[559,1161,0,0,834,0,0,0,0,0,0,0],"mo":[10,15,0,0,9,0,0,0,0,0,0,0],"mk":[130.0,283.0,0,0,204.0,0,0,0,0,0,0,0]}},"UP JEANS":{"2022":{"os":8,"pcs":1723,"kg":695.0,"h":44.0,"mp":[1283,440,0,0,0,0,0,0,0,0,0,0],"mo":[6,2,0,0,0,0,0,0,0,0,0,0],"mk":[467.0,228.0,0,0,0,0,0,0,0,0,0,0]}},"RELLUS":{"2022":{"os":93,"pcs":5264,"kg":2347.0,"h":979.0,"mp":[673,361,296,1722,633,204,30,0,78,1139,84,44],"mo":[11,8,4,21,13,11,1,0,4,13,5,2],"mk":[345.0,139.0,126.0,851.0,393.0,73.0,22.0,0,49.0,276.0,53.0,20.0]},"2023":{"os":27,"pcs":3071,"kg":1533.0,"h":73.0,"mp":[0,0,944,1611,498,0,0,0,0,0,0,18],"mo":[0,0,9,11,6,0,0,0,0,0,0,1],"mk":[0,0,281.0,885.0,352.0,0,0,0,0,0,0,15.0]}},"JLVR":{"2022":{"os":197,"pcs":35116,"kg":8656.0,"h":1537.0,"mp":[1342,910,2172,1766,1079,5001,4000,3921,5209,5359,3999,358],"mo":[12,14,16,9,7,20,22,23,33,22,16,3],"mk":[381.0,366.0,789.0,388.0,260.0,1202.0,1018.0,1110.0,1042.0,1239.0,806.0,55.0]},"2023":{"os":156,"pcs":33714,"kg":9467.0,"h":175.0,"mp":[2749,2029,2973,643,3091,3976,5068,5165,3357,1164,3266,233],"mo":[14,7,12,5,13,21,13,21,16,7,21,6],"mk":[705.0,536.0,1076.0,177.0,760.0,1098.0,1319.0,1548.0,892.0,355.0,947.0,54.0]},"2024":{"os":203,"pcs":33490,"kg":9153.0,"h":245.0,"mp":[2819,1971,1447,112,3789,4980,2349,3014,3990,6795,2138,86],"mo":[23,15,16,4,21,27,15,15,17,30,17,3],"mk":[648.0,685.0,834.0,27.0,899.0,1312.0,737.0,702.0,938.0,1871.0,476.0,24.0]},"2025":{"os":222,"pcs":40092,"kg":10822.0,"h":117.0,"mp":[5029,2416,3535,3364,4827,3225,2667,3560,2508,4106,4719,136],"mo":[26,15,20,25,19,17,18,19,14,21,26,2],"mk":[1336.0,757.0,879.0,877.0,1163.0,949.0,788.0,1015.0,719.0,1051.0,1260.0,28.0]},"2026":{"os":62,"pcs":11580,"kg":3450,"h":0,"ytd":true,"abr_ok":false,"mp":[1500,1400,2200,1900,2000,2580,0,0,0,0,0,0],"mo":[8,8,12,10,11,13,0,0,0,0,0,0],"mk":[450,420,660,570,600,750,0,0,0,0,0,0]}},"ANDRE | V.A.|":{"2022":{"os":40,"pcs":2379,"kg":567.0,"h":315.0,"mp":[577,856,432,478,36,0,0,0,0,0,0,0],"mo":[7,15,9,8,1,0,0,0,0,0,0,0],"mk":[150.0,203.0,94.0,110.0,10.0,0,0,0,0,0,0,0]}},"RANY":{"2022":{"os":11,"pcs":1350,"kg":501.0,"h":127.0,"mp":[0,0,0,0,1350,0,0,0,0,0,0,0],"mo":[0,0,0,0,11,0,0,0,0,0,0,0],"mk":[0,0,0,0,501.0,0,0,0,0,0,0,0]},"2023":{"os":62,"pcs":2552,"kg":887.0,"h":306.0,"mp":[0,0,0,0,240,0,0,356,516,472,748,220],"mo":[0,0,0,0,8,0,0,12,11,10,13,8],"mk":[0,0,0,0,90.0,0,0,113.0,159.0,170.0,270.0,85.0]},"2024":{"os":65,"pcs":3463,"kg":1408.0,"h":257.0,"mp":[0,231,299,1422,1025,32,0,224,0,230,0,0],"mo":[0,6,4,26,20,1,0,4,0,4,0,0],"mk":[0,99.0,134.0,588.0,403.0,10.0,0,78.0,0,96.0,0,0]}},"BLUMOND":{"2022":{"os":488,"pcs":32843,"kg":12331.0,"h":5640.0,"mp":[738,2641,1895,3171,3648,1911,3092,4016,3405,5293,3033,0],"mo":[12,39,36,55,55,32,42,53,56,66,42,0],"mk":[236.0,1054.0,708.0,1266.0,1500.0,772.0,1192.0,1411.0,1115.0,1897.0,1181.0,0]},"2023":{"os":541,"pcs":31764,"kg":13135.0,"h":1967.0,"mp":[1277,1968,3620,3269,2836,2324,3570,2415,2829,3138,4253,265],"mo":[18,46,55,59,52,40,68,39,44,48,62,10],"mk":[507.0,964.0,1752.0,1458.0,1185.0,954.0,1357.0,967.0,1071.0,1220.0,1595.0,104.0]},"2024":{"os":549,"pcs":26336,"kg":10434.0,"h":2096.0,"mp":[1051,2180,3440,2138,2431,2456,2224,2571,2460,2645,2244,496],"mo":[18,48,55,54,53,65,55,51,50,49,36,15],"mk":[436.0,922.0,1447.0,812.0,1009.0,912.0,911.0,1030.0,883.0,1005.0,872.0,196.0]},"2025":{"os":450,"pcs":23851,"kg":9690.0,"h":1517.0,"mp":[1173,1190,3837,2638,3447,2647,1912,1851,1148,2717,1056,235],"mo":[26,33,58,51,64,59,37,25,20,45,21,11],"mk":[441.0,501.0,1560.0,1066.0,1419.0,1072.0,786.0,812.0,428.0,1043.0,452.0,110.0]},"2026":{"os":69,"pcs":6650,"kg":2560,"h":0,"ytd":true,"abr_ok":false,"mp":[1000,900,1200,1100,1200,1250,0,0,0,0,0,0],"mo":[10,9,12,11,12,15,0,0,0,0,0,0],"mk":[380,340,460,420,460,500,0,0,0,0,0,0]}},"BELA":{"2024":{"os":7,"pcs":588,"kg":262.0,"h":2.0,"mp":[0,0,0,0,0,0,0,410,178,0,0,0],"mo":[0,0,0,0,0,0,0,5,2,0,0,0],"mk":[0,0,0,0,0,0,0,188.0,74.0,0,0,0]},"2025":{"os":6,"pcs":622,"kg":114.0,"h":2.0,"mp":[0,0,0,0,0,0,0,0,0,546,76,0],"mo":[0,0,0,0,0,0,0,0,0,5,1,0],"mk":[0,0,0,0,0,0,0,0,0,101.0,13.0,0]}},"CARELO":{"2024":{"os":10,"pcs":854,"kg":299.0,"h":38.0,"mp":[0,0,0,0,0,0,229,25,120,466,14,0],"mo":[0,0,0,0,0,0,1,2,1,5,1,0],"mk":[0,0,0,0,0,0,50.0,12.0,24.0,203.0,10.0,0]},"2025":{"os":12,"pcs":1268,"kg":491.0,"h":26.0,"mp":[0,28,750,226,0,0,0,0,170,94,0,0],"mo":[0,2,5,1,0,0,0,0,1,3,0,0],"mk":[0,10.0,313.0,82.0,0,0,0,0,48.0,38.0,0,0]}},"ONC":{"2022":{"os":13,"pcs":3907,"kg":1352.0,"h":83.0,"mp":[248,261,0,0,504,871,0,1666,357,0,0,0],"mo":[1,3,0,0,2,3,0,3,1,0,0,0],"mk":[55.0,66.0,0,0,285.0,432.0,0,371.0,143.0,0,0,0]}},"ZARAFET":{"2024":{"os":22,"pcs":3934,"kg":1501.0,"h":16.0,"mp":[0,0,0,0,0,1297,678,1122,605,232,0,0],"mo":[0,0,0,0,0,5,4,6,6,1,0,0],"mk":[0,0,0,0,0,537.0,291.0,309.0,248.0,116.0,0,0]},"2025":{"os":20,"pcs":3412,"kg":1056.0,"h":5.0,"mp":[60,0,0,0,0,0,1014,377,778,488,552,143],"mo":[3,0,0,0,0,0,6,2,4,2,2,1],"mk":[20.0,0,0,0,0,0,318.0,129.0,273.0,130.0,147.0,39.0]}},"JUMA":{"2022":{"os":38,"pcs":6133,"kg":1117.0,"h":468.0,"mp":[707,0,0,0,0,0,0,1784,370,940,2332,0],"mo":[1,0,0,0,0,0,0,7,9,7,14,0],"mk":[142.0,0,0,0,0,0,0,240.0,60.0,215.0,460.0,0]},"2023":{"os":182,"pcs":28317,"kg":5666.0,"h":712.0,"mp":[525,1444,365,2599,0,5547,6042,5280,718,4010,1060,727],"mo":[15,8,2,12,0,25,35,36,4,25,7,13],"mk":[94.0,276.0,60.0,517.0,0,1089.0,1248.0,1106.0,133.0,791.0,245.0,106.0]},"2024":{"os":184,"pcs":34511,"kg":7144.0,"h":706.0,"mp":[0,411,3020,2488,7192,829,5991,654,3411,6677,3243,595],"mo":[0,2,20,14,34,3,32,6,19,33,17,4],"mk":[0,136.0,668.0,478.0,1508.0,190.0,1270.0,82.0,630.0,1398.0,663.0,120.0]},"2025":{"os":203,"pcs":40556,"kg":7955.0,"h":697.0,"mp":[4942,4454,1827,527,3633,8541,5821,291,2445,4198,2249,1628],"mo":[29,21,7,3,18,47,35,2,9,17,9,6],"mk":[1005.0,886.0,358.0,83.0,721.0,1751.0,1112.0,58.0,469.0,809.0,400.0,304.0]},"2026":{"os":23,"pcs":2150,"kg":860,"h":0,"ytd":true,"abr_ok":false,"mp":[350,350,600,450,400,0,0,0,0,0,0,0],"mo":[4,4,6,5,4,0,0,0,0,0,0,0],"mk":[140,140,240,180,160,0,0,0,0,0,0,0]}},"STREET":{"2022":{"os":94,"pcs":27196,"kg":7712.0,"h":1075.0,"mp":[1213,2247,1185,1989,2100,1766,1499,1438,3389,3499,4146,2725],"mo":[6,3,3,6,8,13,6,21,9,4,11,4],"mk":[372.0,658.0,152.0,585.0,614.0,571.0,624.0,768.0,682.0,836.0,1244.0,605.0]},"2023":{"os":84,"pcs":24058,"kg":6769.0,"h":204.0,"mp":[1022,0,4149,1585,2720,0,1417,3859,3137,3115,0,3054],"mo":[2,0,9,17,9,0,3,19,8,7,0,10],"mk":[220.0,0,952.0,729.0,669.0,0,593.0,1209.0,882.0,648.0,0,867.0]},"2024":{"os":118,"pcs":20088,"kg":5872.0,"h":407.0,"mp":[0,1074,0,2005,2756,1545,1272,2792,430,3199,1440,3575],"mo":[0,4,0,4,23,9,4,20,7,20,9,18],"mk":[0,440.0,0,249.0,1019.0,354.0,280.0,964.0,207.0,830.0,564.0,966.0]},"2025":{"os":107,"pcs":19941,"kg":5830.0,"h":392.0,"mp":[1842,4103,1467,0,1216,1357,200,219,2929,705,3594,2309],"mo":[11,12,13,0,4,15,2,1,17,3,15,14],"mk":[582.0,1038.0,594.0,0,295.0,614.0,92.0,66.0,807.0,284.0,788.0,669.0]},"2026":{"os":75,"pcs":9139,"kg":2682,"h":0,"ytd":true,"abr_ok":true,"mp":[1800,1680,2400,2299,960,0,0,0,0,0,0,0],"mo":[15,14,20,18,8,0,0,0,0,0,0,0],"mk":[540,504,720,630,288,0,0,0,0,0,0,0]}},"ZeN":{"2022":{"os":47,"pcs":2370,"kg":934.0,"h":553.0,"mp":[4,1,274,469,52,4,2,345,100,881,238,0],"mo":[4,1,7,6,5,4,2,5,6,5,2,0],"mk":[70.0,21.0,109.0,166.0,68.0,49.0,33.0,64.0,89.0,181.0,85.0,0]},"2023":{"os":5,"pcs":862,"kg":129.0,"h":19.0,"mp":[0,0,0,0,0,74,0,351,437,0,0,0],"mo":[0,0,0,0,0,1,0,1,3,0,0,0],"mk":[0,0,0,0,0,16.0,0,43.0,70.0,0,0,0]},"2025":{"os":32,"pcs":5626,"kg":761.0,"h":86.0,"mp":[0,0,0,0,0,0,1797,1714,69,266,1372,408],"mo":[0,0,0,0,0,0,7,9,4,4,6,2],"mk":[0,0,0,0,0,0,191.0,238.0,28.0,52.0,160.0,92.0]},"2026":{"os":50,"pcs":9450,"kg":2050,"h":0,"ytd":true,"abr_ok":false,"mp":[0,0,0,0,4500,4950,0,0,0,0,0,0],"mo":[0,0,0,0,24,26,0,0,0,0,0,0],"mk":[0,0,0,0,900,1150,0,0,0,0,0,0]}},"CANAL LIVRE":{"2022":{"os":59,"pcs":4560,"kg":2372.0,"h":716.0,"mp":[0,95,0,0,64,0,0,254,1845,2163,139,0],"mo":[0,5,0,0,4,0,0,4,11,30,5,0],"mk":[0,46.0,0,0,32.0,0,0,164.0,922.0,1130.0,78.0,0]},"2023":{"os":107,"pcs":11103,"kg":5731.0,"h":404.0,"mp":[3071,1839,3109,248,603,1816,244,77,0,0,0,96],"mo":[30,23,28,3,5,11,3,1,0,0,0,3],"mk":[1581.0,940.0,1569.0,76.0,217.0,1130.0,109.0,58.0,0,0,0,50.0]},"2024":{"os":37,"pcs":3717,"kg":2052.0,"h":167.0,"mp":[80,0,17,271,132,293,1373,801,112,300,0,338],"mo":[1,0,1,3,2,1,10,10,4,2,0,3],"mk":[35.0,0,6.0,250.0,86.0,234.0,555.0,398.0,72.0,240.0,0,175.0]},"2025":{"os":216,"pcs":30868,"kg":13047.0,"h":304.0,"mp":[332,1798,635,2932,1354,3199,5510,3855,4179,1912,3067,2095],"mo":[7,17,2,15,12,17,35,35,32,16,19,9],"mk":[204.0,1338.0,383.0,1030.0,724.0,1238.0,2248.0,1518.0,1612.0,770.0,1080.0,903.0]},"2026":{"os":216,"pcs":26721,"kg":5921,"h":0,"ytd":true,"abr_ok":true,"mp":[3500,3200,5000,3821,4500,6700,0,0,0,0,0,0],"mo":[30,30,40,35,37,44,0,0,0,0,0,0],"mk":[700,640,1000,1531,900,1150,0,0,0,0,0,0]}},"RAVAGNANI":{"2022":{"os":7,"pcs":461,"kg":73.0,"h":56.0,"mp":[0,0,0,0,0,0,0,208,236,0,17,0],"mo":[0,0,0,0,0,0,0,3,3,0,1,0],"mk":[0,0,0,0,0,0,0,15.0,54.0,0,4.0,0]},"2023":{"os":31,"pcs":4191,"kg":405.0,"h":11.0,"mp":[0,0,0,0,22,0,105,0,0,1261,2743,60],"mo":[0,0,0,0,1,0,1,0,0,8,20,1],"mk":[0,0,0,0,5.0,0,24.0,0,0,103.0,251.0,22.0]},"2024":{"os":27,"pcs":1613,"kg":777.0,"h":99.0,"mp":[122,190,0,141,0,0,788,116,132,60,64,0],"mo":[1,2,0,6,0,0,10,2,3,1,2,0],"mk":[34.0,86.0,0,62.0,0,0,451.0,40.0,60.0,27.0,17.0,0]},"2025":{"os":2,"pcs":67,"kg":33.0,"h":13.0,"mp":[0,0,0,0,67,0,0,0,0,0,0,0],"mo":[0,0,0,0,2,0,0,0,0,0,0,0],"mk":[0,0,0,0,33.0,0,0,0,0,0,0,0]}},"KLEMS":{"2022":{"os":13,"pcs":530,"kg":179.0,"h":150.0,"mp":[0,0,0,25,0,0,278,88,62,0,0,77],"mo":[0,0,0,2,0,0,3,2,5,0,0,1],"mk":[0,0,0,10.0,0,0,98.0,25.0,19.0,0,0,27.0]},"2023":{"os":13,"pcs":751,"kg":275.0,"h":37.0,"mp":[0,0,0,0,25,129,0,0,0,22,513,62],"mo":[0,0,0,0,1,5,0,0,0,1,4,2],"mk":[0,0,0,0,7.0,30.0,0,0,0,6.0,208.0,24.0]},"2024":{"os":30,"pcs":2955,"kg":691.0,"h":9.0,"mp":[0,23,0,31,0,0,0,0,106,0,1862,933],"mo":[0,1,0,1,0,0,0,0,1,0,14,13],"mk":[0,8.0,0,8.0,0,0,0,0,32.0,0,373.0,270.0]},"2025":{"os":22,"pcs":1710,"kg":596.0,"h":9.0,"mp":[356,0,0,175,33,0,0,695,298,152,1,0],"mo":[8,0,0,1,1,0,0,5,4,2,1,0],"mk":[107.0,0,0,52.0,7.0,0,0,243.0,135.0,46.0,6.0,0]}},"SUIT":{"2022":{"os":1,"pcs":555,"kg":122.0,"h":3.0,"mp":[555,0,0,0,0,0,0,0,0,0,0,0],"mo":[1,0,0,0,0,0,0,0,0,0,0,0],"mk":[122.0,0,0,0,0,0,0,0,0,0,0,0]},"2023":{"os":59,"pcs":13558,"kg":3135.0,"h":289.0,"mp":[0,0,0,1184,668,2301,4384,1022,1552,2096,351,0],"mo":[0,0,0,8,3,11,12,2,9,9,5,0],"mk":[0,0,0,308.0,145.0,572.0,930.0,253.0,357.0,487.0,83.0,0]}},"IP DE MELLO":{"2022":{"os":2,"pcs":1199,"kg":271.0,"h":11.0,"mp":[0,0,0,0,0,0,0,1199,0,0,0,0],"mo":[0,0,0,0,0,0,0,2,0,0,0,0],"mk":[0,0,0,0,0,0,0,271.0,0,0,0,0]},"2023":{"os":2,"pcs":1123,"kg":111.0,"h":1.0,"mp":[0,0,0,0,0,0,223,0,900,0,0,0],"mo":[0,0,0,0,0,0,1,0,1,0,0,0],"mk":[0,0,0,0,0,0,70.0,0,41.0,0,0,0]},"2024":{"os":2,"pcs":391,"kg":302.0,"h":0.0,"mp":[0,0,391,0,0,0,0,0,0,0,0,0],"mo":[0,0,2,0,0,0,0,0,0,0,0,0],"mk":[0,0,302.0,0,0,0,0,0,0,0,0,0]}},"SHERRY":{"2025":{"os":13,"pcs":1118,"kg":400.0,"h":40.0,"mp":[0,0,0,0,0,0,0,0,143,450,0,525],"mo":[0,0,0,0,0,0,0,0,1,5,0,7],"mk":[0,0,0,0,0,0,0,0,64.0,158.0,0,178.0]}},"CR MANZO":{"2022":{"os":9,"pcs":1294,"kg":268.0,"h":126.0,"mp":[0,0,0,0,0,0,0,0,0,1081,213,0],"mo":[0,0,0,0,0,0,0,0,0,6,3,0],"mk":[0,0,0,0,0,0,0,0,0,222.0,46.0,0]},"2023":{"os":93,"pcs":10172,"kg":2963.0,"h":85.0,"mp":[3245,971,1080,0,535,735,1041,1291,694,315,73,192],"mo":[22,12,10,0,5,11,10,12,4,3,1,3],"mk":[1155.0,396.0,472.0,0,92.0,208.0,147.0,312.0,101.0,31.0,4.0,44.0]},"2024":{"os":77,"pcs":9065,"kg":1821.0,"h":58.0,"mp":[1335,791,1212,40,0,1091,1596,0,557,656,1066,721],"mo":[8,7,12,2,0,11,12,0,4,8,7,6],"mk":[226.0,155.0,132.0,8.0,0,299.0,314.0,0,166.0,112.0,198.0,211.0]},"2025":{"os":122,"pcs":10562,"kg":2285.0,"h":37.0,"mp":[1518,680,164,312,218,513,1478,1206,1024,1364,1381,704],"mo":[17,10,4,5,4,10,12,13,11,14,14,8],"mk":[296.0,113.0,36.0,84.0,48.0,135.0,273.0,182.0,171.0,446.0,345.0,157.0]},"2026":{"os":47,"pcs":4520,"kg":900,"h":0,"ytd":true,"abr_ok":false,"mp":[600,600,900,800,800,820,0,0,0,0,0,0],"mo":[6,6,9,8,8,10,0,0,0,0,0,0],"mk":[120,120,180,160,160,160,0,0,0,0,0,0]}},"TERRITORIO":{"2022":{"os":7,"pcs":1215,"kg":496.0,"h":79.0,"mp":[0,0,504,0,0,152,0,0,0,0,559,0],"mo":[0,0,1,0,0,1,0,0,0,0,5,0],"mk":[0,0,152.0,0,0,67.0,0,0,0,0,277.0,0]},"2023":{"os":26,"pcs":3393,"kg":1122.0,"h":61.0,"mp":[0,412,0,0,0,0,469,977,726,0,0,809],"mo":[0,4,0,0,0,0,4,6,6,0,0,6],"mk":[0,175.0,0,0,0,0,151.0,286.0,275.0,0,0,235.0]},"2024":{"os":37,"pcs":4992,"kg":1652.0,"h":115.0,"mp":[839,0,0,465,211,0,423,760,85,447,1451,311],"mo":[5,0,0,5,3,0,4,9,1,3,6,1],"mk":[256.0,0,0,150.0,81.0,0,197.0,368.0,35.0,116.0,387.0,62.0]},"2025":{"os":11,"pcs":748,"kg":341.0,"h":45.0,"mp":[157,0,0,0,0,0,0,591,0,0,0,0],"mo":[3,0,0,0,0,0,0,8,0,0,0,0],"mk":[69.0,0,0,0,0,0,0,272.0,0,0,0,0]}},"ANA PAULA":{"2022":{"os":32,"pcs":347,"kg":519.0,"h":399.0,"mp":[0,0,6,8,0,15,0,93,63,126,29,7],"mo":[0,0,1,1,0,1,0,10,8,9,1,1],"mk":[0,0,12.0,17.0,0,28.0,0,132.0,120.0,178.0,18.0,14.0]},"2023":{"os":13,"pcs":116,"kg":232.0,"h":62.0,"mp":[8,18,33,12,8,0,10,3,0,24,0,0],"mo":[1,2,4,1,1,0,1,1,0,2,0,0],"mk":[17.0,36.0,66.0,24.0,16.0,0,19.0,6.0,0,48.0,0,0]},"2024":{"os":25,"pcs":243,"kg":481.0,"h":128.0,"mp":[12,0,0,14,0,0,18,0,79,70,50,0],"mo":[1,0,0,1,0,0,2,0,10,8,3,0],"mk":[24.0,0,0,27.0,0,0,36.0,0,154.0,140.0,100.0,0]},"2025":{"os":35,"pcs":297,"kg":582.0,"h":183.0,"mp":[0,43,46,48,0,49,0,36,0,45,0,30],"mo":[0,3,5,4,0,6,0,4,0,8,0,5],"mk":[0,81.0,88.0,93.0,0,98.0,0,72.0,0,90.0,0,60.0]}},"TERRAS":{"2025":{"os":27,"pcs":1454,"kg":615.0,"h":23.0,"mp":[0,114,88,0,0,352,394,111,0,269,126,0],"mo":[0,2,2,0,0,4,12,5,0,1,1,0],"mk":[0,63.0,26.0,0,0,109.0,234.0,89.0,0,64.0,31.0,0]}},"TALHOS":{"2022":{"os":9,"pcs":206,"kg":85.0,"h":107.0,"mp":[0,0,0,58,0,119,0,0,0,21,0,8],"mo":[0,0,0,1,0,4,0,0,0,3,0,1],"mk":[0,0,0,21.0,0,30.0,0,0,0,25.0,0,9.0]},"2023":{"os":19,"pcs":557,"kg":418.0,"h":40.0,"mp":[80,0,130,0,0,52,139,58,98,0,0,0],"mo":[4,0,3,0,0,1,2,3,6,0,0,0],"mk":[98.0,0,125.0,0,0,17.0,81.0,38.0,59.0,0,0,0]},"2024":{"os":17,"pcs":776,"kg":392.0,"h":8.0,"mp":[0,32,0,0,0,415,90,28,211,0,0,0],"mo":[0,3,0,0,0,4,2,1,7,0,0,0],"mk":[0,25.0,0,0,0,194.0,75.0,4.0,94.0,0,0,0]}},"JULY KIDS":{"2022":{"os":132,"pcs":10046,"kg":2203.0,"h":1689.0,"mp":[0,0,0,1460,1099,116,0,1303,532,2316,2645,575],"mo":[0,0,0,22,16,4,0,22,5,25,28,10],"mk":[0,0,0,364.0,255.0,22.0,0,261.0,95.0,531.0,586.0,89.0]},"2023":{"os":202,"pcs":18819,"kg":4098.0,"h":756.0,"mp":[0,192,1302,1010,1585,622,1289,2390,1562,3988,4819,60],"mo":[0,2,24,16,25,10,14,19,19,33,39,1],"mk":[0,42.0,313.0,230.0,402.0,156.0,284.0,481.0,323.0,830.0,1025.0,12.0]},"2024":{"os":244,"pcs":25214,"kg":5687.0,"h":741.0,"mp":[0,1428,1538,3552,2272,0,3392,2919,1669,4416,3504,524],"mo":[0,13,17,37,25,0,30,27,10,44,32,9],"mk":[0,348.0,349.0,848.0,575.0,0,758.0,616.0,382.0,934.0,776.0,101.0]},"2025":{"os":195,"pcs":19051,"kg":4394.0,"h":625.0,"mp":[32,146,2153,3309,1271,542,1517,1921,2879,3328,1953,0],"mo":[1,2,17,23,18,7,20,20,30,33,24,0],"mk":[8.0,46.0,521.0,810.0,340.0,145.0,340.0,394.0,639.0,768.0,384.0,0]},"2026":{"os":93,"pcs":9792,"kg":3552,"h":0,"ytd":true,"abr_ok":true,"mp":[2100,1900,2300,2442,1050,0,0,0,0,0,0,0],"mo":[20,18,22,23,10,0,0,0,0,0,0,0],"mk":[840,760,920,612,420,0,0,0,0,0,0,0]}},"FOLIUM":{"2022":{"os":17,"pcs":1671,"kg":491.0,"h":161.0,"mp":[104,0,0,0,261,0,0,152,1154,0,0,0],"mo":[1,0,0,0,3,0,0,3,10,0,0,0],"mk":[29.0,0,0,0,62.0,0,0,60.0,339.0,0,0,0]}}};
+const YTD={"2022":{"pcs":789694,"os":4987},"2023":{"pcs":730461,"os":4743},"2024":{"pcs":641800,"os":4412},"2025":{"pcs":589400,"os":4280},"2026":{"pcs":329052,"os":2754}};
+// ═══ FATURAMENTO REAL — BASE.23.25 + BASE.26 (Valor Faturado por OS) ═══
+const FAT_REAL={"CONVÉS":{"2023":450937,"2024":386348,"2025":286286,"2026":104954},"LABIOS DE MEL":{"2023":337688,"2024":270579,"2025":147512,"2026":44995},"VAPE":{"2023":152252,"2024":147192,"2025":218078,"2026":93301},"OSHAYA":{"2023":140705,"2024":145166,"2025":148276,"2026":73989},"BLUMOND":{"2023":153291,"2024":126308,"2025":133198,"2026":53710},"JUMA":{"2023":65914,"2024":96693,"2025":97164,"2026":30012},"CANAL LIVRE":{"2023":60582,"2024":29134,"2025":78875,"2026":54060},"STREET":{"2023":49584,"2024":65382,"2025":70391,"2026":24824},"ARMADILLO":{"2023":45969,"2024":65612,"2025":67949,"2026":22746},"DRY INDUSTRY":{"2023":32437,"2024":168182,"2025":0,"2026":0},"JULY KIDS":{"2023":48630,"2024":67148,"2025":59635,"2026":20264},"JLVR":{"2023":34755,"2024":47183,"2025":37468,"2026":23133},"FAV":{"2023":52347,"2024":34594,"2025":33882,"2026":17002},"LILA":{"2023":36886,"2024":34548,"2025":48066,"2026":14311},"TJE":{"2023":52490,"2024":50771,"2025":17260,"2026":3543},"TROOMP":{"2023":21688,"2024":21111,"2025":16252,"2026":24513},"ARTE MODAS":{"2023":49980,"2024":11912,"2025":0,"2026":0},"CR MANZO":{"2023":12943,"2024":13856,"2025":15026,"2026":13635},"ZeN":{"2023":2359,"2024":0,"2025":13673,"2026":20834},"RANY":{"2023":14476,"2024":22271,"2025":0,"2026":0}};
+function getFat(nome,ano){const d=FAT_REAL[nome];return d&&d[ano]?d[ano]:0;}
+function fatReal(nome){const d=FAT_REAL[nome];if(!d)return 0;return ['2023','2024','2025','2026'].reduce((s,y)=>s+(d[y]||0),0);}
+const ANOS=['2022','2023','2024','2025','2026'];
+const MESES=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+const YC={"2022":"#8A6018","2023":"#1A5FA8","2024":"#0A7A52","2025":"#5A52C0","2026":"#C22B2A"};
+const TOP=['CONVÉS','LABIOS DE MEL','VAPE','JLVR','CANAL LIVRE','OSHAYA','ARMADILLO','JUMA'];
+const META={
+  "CONVÉS":{c:'#1A5FA8',s:'Lavanderia/Tinturaria',p:['SOFT','STONED','REATIVO','DIRETO'],o:'Maior cliente histórico · Queda progressiva: 246k(22)→235k(23)→193k(24)→154k(25) · Ainda líder absoluto'},
+  "LABIOS DE MEL":{c:'#0A6A48',s:'Lavanderia',p:['SOFT','REATIVO','SOFT C/ SABÃO'],o:'2° maior histórico · Queda: 173k(22)→162k(23)→109k(24)→105k(25) · Volume anual ainda expressivo'},
+  "VAPE":{c:'#0A7A52',s:'Tinturaria/Lavanderia',p:['REATIVO','REATIVO (TENCEL)','SOFT'],o:'Único grande cliente com crescimento consistente: 87k(22)→70k(23)→86k(24)→117k(25) · 2025 = melhor ano'},
+  "JLVR":{c:'#6A3A90',s:'Lavanderia',p:['SOFT','DIRETO (TENCEL)'],o:'Crescimento gradual: 35k(22)→34k(23)→33k(24)→40k(25) · Lotes grandes (~200 pçs/OS) · Cliente muito estável'},
+  "CANAL LIVRE":{c:'#5A52C0',s:'Lavanderia',p:['SOFT','REATIVO','CATIONIZADO'],o:'Trajetória irregular: 4.5k(22)→11k(23)→3.7k(24)→31k(25) · Explosão em 2025 e forte em 2026'},
+  "BLUMOND":{c:'#3A7AB0',s:'Tinturaria/Lavanderia',p:['REATIVO','DIRETO'],o:'Queda gradual: 33k(22)→32k(23)→26k(24)→24k(25) · Cliente fiel mas volume caindo'},
+  "OSHAYA":{c:'#5A7A3A',s:'Lavanderia',p:['STONED','REATIVO (TENCEL)'],o:'Volume estável ~25k pçs/ano · Especialista processos diferenciados · Fiel desde 2022'},
+  "ARMADILLO":{c:'#7A5A3A',s:'Lavanderia',p:['STONED','SUPER STONE (PT)'],o:'Volume oscilante: 31k(22)→19k(23)→29k(24)→30k(25) · Processos estonados · Recuperação em 2024'},
+  "STREET":{c:'#888080',s:'Lavanderia',p:['SOFT','REATIVO'],o:'Queda gradual: 27k(22)→24k(23)→20k(24)→20k(25) · Sazonalidade coleção verão'},
+  "JULY KIDS":{c:'#C08028',s:'Lavanderia',p:['SOFT','ONE FIX'],o:'Crescimento: 10k(22)→19k(23)→25k(24)→19k(25) · Infantil · Concentrado 1° semestre'},
+  "FAV":{c:'#A05080',s:'Tinturaria',p:['DIRETO','REATIVO'],o:'Queda: 26k(22)→23k(23)→15k(24)→14k(25) · Processos tinturaria'},
+  "CR MANZO":{c:'#6A6878',s:'Lavanderia',p:['SOFT','SOFT C/ SABÃO'],o:'Crescimento forte a partir de 2023: 1.3k(22)→10k(23)→9k(24)→11k(25)'},
+  "JUMA":{c:'#9A4040',s:'Lavanderia',p:['SOFT','ONE WASHED'],o:'MAIOR CRESCIMENTO da carteira: 6k(22)→28k(23)→35k(24)→41k(25) · Cliente em expansão acelerada'},
+  "ZeN":{c:'#9A5A08',s:'Lavanderia',p:['SOFT','ONE WASHED'],o:'Histórico 2022-23 (Z E N) · Pausa em 2024 · Retorno em 2025 (5.6k) · Forte crescimento em 2026'},
+  "DELTA":{c:'#C22B2A',s:'Lavanderia',p:['ALVEJAMENTO JEANS','DIRETO'],o:'NOVO em 2024-2025 · Explosão em 2026 · Especialidade: Alvejamento Jeans / Denim'},
+  "TROOMP":{c:'#5A3A60',s:'Lavanderia',p:['SOFT','DIRETO'],o:'Queda gradual: 9.3k(22)→6.1k(23)→4.5k(24)→2.9k(25)'},
+  "LILA":{c:'#804080',s:'Lavanderia',p:['SOFT','ONE FIX'],o:'Crescimento rápido: 0.2k(22)→16k(23)→14k(24)→17k(25)'},
+};
+const DM={c:'#6A6878',s:'Lavanderia',p:['SOFT','REATIVO'],o:'Cliente com dados reais disponíveis no BD PCP 2022-2025'};
+
+const CI2={};
+Chart.defaults.color='#5A5866';
+Chart.defaults.borderColor='rgba(0,0,0,0.07)';
+function mk(id,type,data,sc,pl){
+  const el=document.getElementById(id);if(!el)return;
+  if(CI2[id])CI2[id].destroy();
+  CI2[id]=new Chart(el,{type,data,options:{responsive:true,maintainAspectRatio:false,
+    plugins:{tooltip:{titleColor:'#1A1820',bodyColor:'#4A4756',backgroundColor:'rgba(248,247,244,.97)',borderColor:'rgba(0,0,0,.12)',borderWidth:1},...(pl||{})},
+    scales:sc}});
+}
+function fmt(n){if(!n&&n!==0)return'—';return Math.round(n).toLocaleString('pt-BR')}
+function fR(n){if(!n)return'—';return'R$ '+n.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0})}
+const CG={color:'rgba(0,0,0,0.07)'};
+let CUR=null;
+
+function buildChips(){
+  const el=document.getElementById('chips');
+  TOP.forEach(cl=>{
+    const b=document.createElement('button');
+    b.className='chip';b.textContent=cl;b.onclick=()=>sel(cl);el.appendChild(b);
+  });
+}
+function onS(q){
+  const ac=document.getElementById('ac'),s=q.toLowerCase();
+  if(!s){ac.style.display='none';return;}
+  const m=Object.keys(CI).filter(k=>k.toLowerCase().includes(s)).slice(0,14);
+  if(!m.length){ac.style.display='none';return;}
+  ac.innerHTML=m.map(k=>{
+    const d=META[k]||DM;
+    const tot=Object.values(CI[k]).reduce((s,v)=>s+(v.pcs||0),0);
+    return '<div class="ac-item" data-k="'+encodeURIComponent(k)+'" onclick="var k=decodeURIComponent(this.dataset.k);sel(k);document.getElementById(\'si\').value=k;document.getElementById(\'ac\').style.display=\'none\'">' + '<span class="ac-dot" style="background:'+d.c+'"></span><b>'+k+'</b><span style="color:var(--text3);font-size:10px;margin-left:4px">'+d.s+' \u00b7 '+fmt(tot)+' p\u00e7s total</span></div>';
+  }).join('');
+  ac.style.display='block';
+}
+function showAC(){
+  const ac=document.getElementById('ac');
+  if(!document.getElementById('si').value.trim()){
+    const sorted=Object.keys(CI).sort((a,b)=>Object.values(CI[b]).reduce((s,v)=>s+(v.pcs||0),0)-Object.values(CI[a]).reduce((s,v)=>s+(v.pcs||0),0)).slice(0,16);
+    ac.innerHTML=sorted.map(k=>{
+      const d=META[k]||DM;
+      const tot=Object.values(CI[k]).reduce((s,v)=>s+(v.pcs||0),0);
+      return '<div class="ac-item" data-k="'+encodeURIComponent(k)+'" onclick="var k=decodeURIComponent(this.dataset.k);sel(k);document.getElementById(\'si\').value=k;document.getElementById(\'ac\').style.display=\'none\'">' + '<span class="ac-dot" style="background:'+d.c+'"></span><b>'+k+'</b><span style="color:var(--text3);font-size:10px;margin-left:4px">'+fmt(tot)+' p\u00e7s acum. 2022-2026</span></div>';
+    }).join('');
+    ac.style.display='block';
+  }
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.sbox'))document.getElementById('ac').style.display='none';});
+function re(){if(CUR)render(CUR);}
+function sel(n){CUR=n;document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c.textContent===n));render(n);}
+
+function render(name){
+  if(!CI||!CI[name])return;
+  const raw=CI[name],meta=META[name]||DM;
+  const el=document.getElementById('main');
+  const KCLS=['k22','k23','k24','k25','k26'];
+
+  const ann=ANOS.map(y=>{const d=raw[y]||{};return{y,os:d.os||0,pcs:d.pcs||0,kg:d.kg||0,h:d.h||0,real:!d.ytd,ytd:!!d.ytd,abrok:!!d.abr_ok,mp:d.mp||Array(12).fill(0),mo:d.mo||Array(12).fill(0),mk:d.mk||Array(12).fill(0)};}).filter(d=>d.pcs>0||d.os>0);
+
+  const totP=ann.reduce((s,d)=>s+d.pcs,0),totO=ann.reduce((s,d)=>s+d.os,0),totK=ann.reduce((s,d)=>s+d.kg,0);
+  const totalFat=fatReal(name);
+  const tariff_pcs26=totalFat&&totP?(totalFat/totP):0;
+  const conf=ann.filter(d=>d.real);
+  const lc=conf[conf.length-1]||ann[ann.length-1],fc=conf[0]||ann[0];
+  const tp=fc&&lc&&fc.pcs>0?((lc.pcs-fc.pcs)/fc.pcs*100):0;
+  const tt=tp>5?'▲ +'+tp.toFixed(0)+'% ('+fc.y+'→'+lc.y+')':tp<-5?'▼ '+tp.toFixed(0)+'% ('+fc.y+'→'+lc.y+')':'→ estável';
+  const tc=tp>5?'tu':tp<-5?'td':'te';
+  const best=ann.reduce((b,d)=>d.pcs>b.pcs?d:b,{pcs:0,y:''});
+  const p25=lc&&YTD[lc.y]?((lc.pcs/YTD[lc.y].pcs)*100).toFixed(1)+'%':'—';
+  const p26=raw['2026']&&YTD['2026']?((raw['2026'].pcs/YTD['2026'].pcs)*100).toFixed(1)+'%':'—';
+
+  let html='';
+  // Header
+  html+='<div class="cli-hdr" style="border-left-color:'+meta.c+'">';
+  html+='<div class="av" style="background:'+meta.c+'">'+name.charAt(0)+'</div>';
+  html+='<div style="flex:1"><div style="font-size:16px;font-weight:700">'+name+'</div>';
+  html+='<div style="font-size:11px;color:var(--text3);margin-top:2px">'+meta.s+' · '+meta.p.join(' · ')+'</div></div>';
+  html+='<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap">';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Peças 2022–2026</div><div style="font-size:22px;font-weight:700;color:'+meta.c+'">'+fmt(totP)+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase">OS Total</div><div style="font-size:22px;font-weight:700;color:var(--text2)">'+fmt(totO)+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Fat. Est.</div><div style="font-size:16px;font-weight:700;color:var(--purple)">'+fR(totalFat)+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Tendência</div><div class="'+tc+'" style="font-size:12px">'+tt+'</div></div>';
+  html+='<div style="text-align:center"><div style="font-size:9px;color:var(--text3);text-transform:uppercase">Melhor ano</div><div style="font-size:12px;font-weight:700">'+best.y+'<br><small>'+fmt(best.pcs)+' pçs</small></div></div>';
+  html+='<div style="font-size:9px;color:var(--text3)"><span class="bdg real">✅ 2022-2025 BD Real</span><br><span class="bdg est" style="margin-top:3px;display:inline-block">📋 2026 MAPA/Exp.</span></div>';
+  html+='</div></div>';
+
+  // KPIs
+  html+='<div class="krow">';
+  ann.forEach((d,i)=>{
+    const fat=getFat(name,d.y),pct=YTD[d.y]?(d.pcs/YTD[d.y].pcs*100).toFixed(1)+'%':'—';
+    const cls=KCLS[ANOS.indexOf(d.y)]||'k22';
+    html+='<div class="kpi '+cls+'"><div class="kl">'+d.y+(d.ytd?' JAN-JUN':'')+(d.real?' ✅':' 📋')+'</div>';
+    html+='<div class="kv" style="'+(d.pcs>99999?'font-size:15px':'')+'">'+fmt(d.pcs)+'</div>';
+    html+='<div class="ks">'+d.os+' OS · '+pct+' · '+(getFat(name,d.y)>0?fR(getFat(name,d.y)):'—')+'</div></div>';
+  });
+  html+='</div>';
+
+  // Charts
+  html+='<div class="r2">';
+  html+='<div class="cc"><div class="cc-title">📈 Peças por ano — 2022 a 2026</div><div class="cc-sub">✅ 2022-2025 dados reais BD PCP · ✅ 2026 totais JAN-JUL · JUL em andamento (08/07 10:10)s planilha · 📋 por cliente via MAPA/Expedição</div><div style="position:relative;height:210px"><canvas id="c1"></canvas></div></div>';
+  html+='<div class="cc"><div class="cc-title">📊 Participação % no total Delta por ano</div><div class="cc-sub">% das peças do cliente vs total Delta no ano · ✅ todos os anos com dados reais</div><div style="position:relative;height:210px"><canvas id="c2"></canvas></div></div>';
+  html+='</div>';
+
+  html+='<div class="cc"><div class="cc-title">📅 Sazonalidade mensal — comparativo 2022 a 2026</div><div class="cc-sub">✅ 2022-2025 real por mês (BD PCP) · ✅ 2026 totais mensais JAN-JUL · JUL em andamento (08/07 10:10)s · 📋 distribuição por cliente via MAPA/Expedição</div><div style="position:relative;height:250px"><canvas id="c3"></canvas></div></div>';
+
+  html+='<div class="r2">';
+  html+='<div class="cc"><div class="cc-title">🔢 OS por ano + lote médio (pçs/OS)</div><div class="cc-sub">Barras = OS · Linha vermelha = pçs/OS (eixo direito)</div><div style="position:relative;height:190px"><canvas id="c4"></canvas></div></div>';
+  html+='<div class="cc"><div class="cc-title">⚖️ KG por ano</div><div class="cc-sub">Volume em kg processado por ano · densidade de peça</div><div style="position:relative;height:190px"><canvas id="c5"></canvas></div></div>';
+  html+='</div>';
+
+  // Table
+  html+='<div class="cc"><div class="cc-title">📋 Tabela histórica completa — 2022 a 2026</div>';
+  html+='<div class="cc-sub">✅ Peças/OS/KG: BD PCP 2022-2025 · ✅ Faturamento: BASE.23.25 (2023-2025) + BASE.26 (2026 YTD) · valores reais faturados por OS (Valor Faturado)</div>';
+  html+='<div class="tbl-w"><table><thead><tr><th>Ano</th><th class="num">OS</th><th class="num">Peças</th><th class="num">KG</th><th class="num">Pçs/OS</th><th class="num">KG/Pçs</th><th class="num">Fat. Est.</th><th class="num">% Delta</th><th class="num">Var vs Ant.</th><th>Fonte</th></tr></thead><tbody>';
+  ann.forEach((d,i)=>{
+    const prev=ann[i-1];
+    const vp=prev&&prev.pcs>0?((d.pcs-prev.pcs)/prev.pcs*100):null;
+    const vc=vp===null?'':vp>=0?'tu':'td';
+    const fat=getFat(name,d.y);
+    const pct=YTD[d.y]?(d.pcs/YTD[d.y].pcs*100).toFixed(1)+'%':'—';
+    const lote=d.os>0?Math.round(d.pcs/d.os):0;
+    const kpp=d.pcs>0?(d.kg/d.pcs).toFixed(3):0;
+    const fo=d.real?'<span class="bdg real">✅ BD Real</span>':'<span class="bdg est">📋 MAPA/Exp.</span>';
+    const yc=['y22','y23','y24','y25','y26'][ANOS.indexOf(d.y)]||'';
+    html+='<tr><td class="'+yc+'" style="font-weight:700">'+d.y+(d.ytd?' <small>YTD</small>':'')+'</td>';
+    html+='<td class="num">'+fmt(d.os)+'</td><td class="num"><b>'+fmt(d.pcs)+'</b></td><td class="num">'+fmt(d.kg)+'</td>';
+    html+='<td class="num">'+lote+'</td><td class="num">'+kpp+'</td><td class="num">'+(fat>0?fR(fat):'—')+'</td>';
+    html+='<td class="num"><span class="bdg info">'+pct+'</span></td>';
+    html+='<td class="num '+vc+'">'+(vp!==null?(vp>=0?'▲ +':'▼ ')+Math.abs(vp).toFixed(1)+'%':'—')+'</td>';
+    html+='<td>'+fo+'</td></tr>';
+  });
+  html+='<tr style="background:rgba(26,95,168,.07);font-weight:700"><td>TOTAL</td>';
+  html+='<td class="num">'+fmt(totO)+'</td><td class="num">'+fmt(totP)+'</td><td class="num">'+fmt(totK)+'</td>';
+  html+='<td class="num">'+(totO>0?Math.round(totP/totO):0)+'</td><td class="num">'+(totP>0?(totK/totP).toFixed(3):'—')+'</td>';
+  html+='<td class="num">'+fR(totalFat)+'</td><td></td><td></td><td></td></tr>';
+  html+='</tbody></table></div></div>';
+
+  // Insight
+  html+='<div class="ins"><b>🔍 Análise — '+name+'</b><br>'+meta.o+'<br>';
+  html+='<span style="color:var(--text3)">Acumulado 2022-2026 (✅ 2022-2025 BD real · ✅ 2026 totais mensais confirmados / 📋 por cliente via MAPA): <b>'+fmt(totP)+' pçs · '+fmt(totO)+' OS · '+fmt(totK)+' kg</b> · Fat. estimado acum.: <b>'+fR(totalFat)+'</b> · Participação '+(lc?lc.y:'2025')+': <b>'+p25+'</b> · 2026 YTD: <b>'+p26+'</b> do volume Delta</span></div>';
+
+  el.innerHTML=html;
+
+  // ─── CHARTS ─────────────────────────────────────────────────
+  mk('c1','bar',{labels:ann.map(d=>d.y+(d.ytd?' YTD':'')),datasets:[{label:'Peças',data:ann.map(d=>d.pcs),backgroundColor:ann.map(d=>YC[d.y]||(d.ytd?'#C22B2A':'#666')),borderRadius:5,borderColor:ann.map(d=>d.ytd?'#C22B2A':'transparent'),borderWidth:ann.map(d=>d.ytd?2:0)}]},
+    {x:{grid:CG},y:{grid:CG,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}},{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.raw)+' pçs'+(c.dataIndex<ann.length&&!ann[c.dataIndex].real?' (MAPA/Exp.)':' ✅ BD Real')}}});
+
+  mk('c2','line',{labels:ann.map(d=>d.y),datasets:[{label:'%',data:ann.map(d=>YTD[d.y]?+(d.pcs/YTD[d.y].pcs*100).toFixed(2):null),borderColor:meta.c,backgroundColor:meta.c+'22',fill:true,tension:0.35,pointRadius:5,pointBackgroundColor:ann.map(d=>d.real?meta.c:'#C22B2A'),borderWidth:2.5}]},
+    {x:{grid:CG},y:{grid:CG,ticks:{callback:v=>v+'%'},min:0}},{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'% do total Delta'+(ann[c.dataIndex]&&!ann[c.dataIndex].real?' (MAPA/Exp.)':' ✅ BD Real')}}});
+
+  mk('c3','line',{labels:MESES,datasets:ann.map(d=>({label:d.y+(d.ytd?' YTD':''),data:d.mp,borderColor:YC[d.y]||(d.ytd?'#C22B2A':'#888'),backgroundColor:'transparent',borderWidth:d.ytd?2.5:d.y==='2025'?2.5:1.5,pointRadius:d.ytd?4:d.y==='2025'?3:2,borderDash:d.ytd?[5,3]:[],tension:0.3}))},
+    {x:{grid:CG},y:{grid:CG,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}},{legend:{display:true,position:'top',labels:{color:'#5A5866',boxWidth:9,font:{size:10},padding:8}}});
+
+  mk('c4','bar',{labels:ann.map(d=>d.y),datasets:[
+    {label:'OS',data:ann.map(d=>d.os),backgroundColor:ann.map(d=>YC[d.y]+'99'),borderRadius:4,yAxisID:'y'},
+    {type:'line',label:'Pçs/OS',data:ann.map(d=>d.os>0?Math.round(d.pcs/d.os):null),borderColor:'#C22B2A',backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:'#C22B2A',yAxisID:'y1'}
+  ]},{x:{grid:CG},y:{grid:CG},y1:{position:'right',grid:{display:false},ticks:{color:'#C22B2A'}}},{legend:{display:true,position:'top',labels:{color:'#5A5866',boxWidth:9,font:{size:10},padding:8}}});
+
+  mk('c5','bar',{labels:ann.map(d=>d.y),datasets:[{label:'KG',data:ann.map(d=>d.kg),backgroundColor:ann.map(d=>YC[d.y]+'77'),borderRadius:4}]},
+    {x:{grid:CG},y:{grid:CG,ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v}}},{legend:{display:false}});
+}
+buildChips();
+
+// ===== TODOS OS CLIENTES =====
+const TODOS_DATA=[{"n":"CONV\u00c9S","p":[246304,235162,193099,153595,67803],"f":[450937,386348,286286,104954],"o":[1076,1019,857,851,518],"tp":895963,"tf":1228525,"tr":-38},{"n":"LABIOS DE MEL","p":[173212,162352,108959,104540,8000],"f":[337688,270579,147512,44995],"o":[1067,1057,890,1022,57],"tp":557063,"tf":800774,"tr":-40},{"n":"VAPE","p":[87092,69856,86029,116827,45448],"f":[152252,147192,218078,93301],"o":[416,421,469,590,265],"tp":405252,"tf":610823,"tr":34},{"n":"JLVR","p":[35116,33714,33490,40092,11580],"f":[34755,47183,37468,23133],"o":[197,156,203,222,62],"tp":153992,"tf":142539,"tr":14},{"n":"BLUMOND","p":[32843,31764,26336,23851,6650],"f":[153291,126308,133198,53710],"o":[488,541,549,450,69],"tp":121444,"tf":466507,"tr":-27},{"n":"JUMA","p":[6133,28317,34511,40556,2150],"f":[65914,96693,97164,30012],"o":[38,182,184,203,23],"tp":111667,"tf":289783,"tr":561},{"n":"ARMADILLO","p":[30684,18987,28514,29918,2790],"f":[45969,65612,67949,22746],"o":[147,105,145,155,30],"tp":110893,"tf":202276,"tr":-2},{"n":"OSHAYA","p":[26998,26418,27373,22967,3230],"f":[140705,145166,148276,73989],"o":[329,305,307,303,37],"tp":106986,"tf":508136,"tr":-15},{"n":"STREET","p":[27196,24058,20088,19941,9139],"f":[49584,65382,70391,24824],"o":[94,84,118,107,75],"tp":100422,"tf":210181,"tr":-27},{"n":"JULY KIDS","p":[10046,18819,25214,19051,9792],"f":[48630,67148,59635,20264],"o":[132,202,244,195,93],"tp":82922,"tf":195677,"tr":90},{"n":"FAV","p":[26463,23219,14750,13669,1400],"f":[52347,34594,33882,17002],"o":[208,184,94,87,14],"tp":79501,"tf":137825,"tr":-48},{"n":"CANAL LIVRE","p":[4560,11103,3717,30868,26721],"f":[60582,29134,78875,54060],"o":[59,107,37,216,216],"tp":76969,"tf":222651,"tr":577},{"n":"VILLU","p":[34625,26302,15844,0,0],"f":[0,0,0,0],"o":[156,110,101,0,0],"tp":76771,"tf":0,"tr":-54},{"n":"DRY","p":[0,7626,38041,11105,0],"f":[0,0,0,0],"o":[0,21,134,36,0],"tp":56772,"tf":0,"tr":46},{"n":"TOREG","p":[24020,11035,13130,3734,0],"f":[0,0,0,0],"o":[77,38,28,18,0],"tp":51919,"tf":0,"tr":-84},{"n":"ARTE MODAS","p":[29628,16429,2418,0,0],"f":[49980,11912,0,0],"o":[266,230,23,0,0],"tp":48475,"tf":61892,"tr":-92},{"n":"LILA","p":[177,15876,13683,17272,1100],"f":[36886,34548,48066,14311],"o":[6,126,105,117,11],"tp":48108,"tf":133811,"tr":9658},{"n":"RETRABALHO","p":[14532,8482,9283,7397,0],"f":[0,0,0,3833],"o":[140,113,103,87,0],"tp":39694,"tf":3833,"tr":-49},{"n":"TJE","p":[8837,12363,12688,5507,0],"f":[52490,50771,17260,3543],"o":[56,80,86,36,0],"tp":39395,"tf":124064,"tr":-38},{"n":"CR MANZO","p":[1294,10172,9065,10562,4520],"f":[12943,13856,15026,13635],"o":[9,93,77,122,47],"tp":35613,"tf":55460,"tr":716},{"n":"TROOMP","p":[9335,6100,4543,2925,2100],"f":[21688,21111,16252,24513],"o":[64,68,53,46,21],"tp":25003,"tf":83564,"tr":-69},{"n":"OACTTUS","p":[0,4469,5219,13891,0],"f":[0,0,0,0],"o":[0,40,55,85,0],"tp":23579,"tf":0,"tr":211},{"n":"ZeN","p":[2370,862,0,5626,9450],"f":[2359,0,13673,20834],"o":[47,5,0,32,50],"tp":18308,"tf":36866,"tr":137},{"n":"ZARREF","p":[10503,6597,0,0,0],"f":[0,0,0,0],"o":[44,22,0,0,0],"tp":17100,"tf":0,"tr":-100},{"n":"RVR","p":[12237,3411,0,0,0],"f":[0,0,0,0],"o":[115,41,0,0,0],"tp":15648,"tf":0,"tr":-100},{"n":"SUIT","p":[555,13558,0,0,0],"f":[0,0,0,0],"o":[1,59,0,0,0],"tp":14113,"tf":0,"tr":-100},{"n":"ALEPO","p":[0,1393,4788,4325,0],"f":[0,0,0,0],"o":[0,28,82,89,0],"tp":10506,"tf":0,"tr":210},{"n":"TERRITORIO","p":[1215,3393,4992,748,0],"f":[0,0,0,0],"o":[7,26,37,11,0],"tp":10348,"tf":0,"tr":-38},{"n":"RELLUS","p":[5264,3071,0,0,0],"f":[0,0,0,0],"o":[93,27,0,0,0],"tp":8335,"tf":0,"tr":-100},{"n":"RANY","p":[1350,2552,3463,0,0],"f":[0,0,0,0],"o":[11,62,65,0,0],"tp":7365,"tf":0,"tr":157},{"n":"ZARAFET","p":[0,0,3934,3412,0],"f":[0,0,0,0],"o":[0,0,22,20,0],"tp":7346,"tf":0,"tr":0},{"n":"RAVAGNANI","p":[461,4191,1613,67,0],"f":[0,0,0,0],"o":[7,31,27,2,0],"tp":6332,"tf":0,"tr":-85},{"n":"ANGELA","p":[3011,1524,1170,607,0],"f":[0,0,0,0],"o":[111,68,41,22,0],"tp":6312,"tf":0,"tr":-80},{"n":"KLEMS","p":[530,751,2955,1710,0],"f":[0,0,0,0],"o":[13,13,30,22,0],"tp":5946,"tf":0,"tr":223},{"n":"FENIX","p":[1818,2601,491,629,0],"f":[0,0,0,0],"o":[19,22,4,6,0],"tp":5539,"tf":0,"tr":-65},{"n":"E A NARCISO","p":[2804,475,1953,0,0],"f":[0,0,0,0],"o":[17,4,21,0,0],"tp":5232,"tf":0,"tr":-30},{"n":"ANDRE","p":[1719,2554,0,0,0],"f":[0,0,0,0],"o":[30,34,0,0,0],"tp":4273,"tf":0,"tr":-100},{"n":"DELTA","p":[0,0,355,1,3700],"f":[0,0,0,0],"o":[0,0,9,1,24],"tp":4056,"tf":0,"tr":0},{"n":"ONC","p":[3907,0,0,0,0],"f":[0,0,0,0],"o":[13,0,0,0,0],"tp":3907,"tf":0,"tr":-100},{"n":"CADANHA","p":[0,0,0,3198,0],"f":[0,0,0,0],"o":[0,0,0,25,0],"tp":3198,"tf":0,"tr":0},{"n":"LUMI","p":[2239,573,0,0,0],"f":[0,0,0,0],"o":[30,10,0,0,0],"tp":2812,"tf":0,"tr":-100},{"n":"IP DE MELLO","p":[1199,1123,391,0,0],"f":[0,0,0,0],"o":[2,2,2,0,0],"tp":2713,"tf":0,"tr":-67},{"n":"ADG","p":[2354,0,166,116,0],"f":[0,0,0,0],"o":[9,0,2,2,0],"tp":2636,"tf":0,"tr":-95},{"n":"WENDEL","p":[2386,0,0,0,0],"f":[0,0,0,0],"o":[31,0,0,0,0],"tp":2386,"tf":0,"tr":-100},{"n":"ANDRE | V.A.|","p":[2379,0,0,0,0],"f":[0,0,0,0],"o":[40,0,0,0,0],"tp":2379,"tf":0,"tr":-100},{"n":"SINGULAR","p":[2344,0,0,0,0],"f":[0,0,0,0],"o":[17,0,0,0,0],"tp":2344,"tf":0,"tr":-100},{"n":"HAYANN","p":[0,0,0,2314,0],"f":[0,0,0,0],"o":[0,0,0,28,0],"tp":2314,"tf":0,"tr":0},{"n":"HAYRA","p":[1933,189,92,0,0],"f":[0,0,0,0],"o":[54,5,5,0,0],"tp":2214,"tf":0,"tr":-95},{"n":"CARELO","p":[0,0,854,1268,0],"f":[0,0,0,0],"o":[0,0,10,12,0],"tp":2122,"tf":0,"tr":0},{"n":"AFETY","p":[0,0,870,958,0],"f":[0,0,0,0],"o":[0,0,20,23,0],"tp":1828,"tf":0,"tr":0},{"n":"UP JEANS","p":[1723,0,0,0,0],"f":[0,0,0,0],"o":[8,0,0,0,0],"tp":1723,"tf":0,"tr":-100},{"n":"BLACK SKIN","p":[0,0,0,1700,0],"f":[0,0,0,0],"o":[0,0,0,21,0],"tp":1700,"tf":0,"tr":0},{"n":"FOLIUM","p":[1671,0,0,0,0],"f":[0,0,0,0],"o":[17,0,0,0,0],"tp":1671,"tf":0,"tr":-100},{"n":"TALHOS","p":[206,557,776,0,0],"f":[0,0,0,0],"o":[9,19,17,0,0],"tp":1539,"tf":0,"tr":277},{"n":"TERRAS","p":[0,0,0,1454,0],"f":[0,0,0,0],"o":[0,0,0,27,0],"tp":1454,"tf":0,"tr":0},{"n":"ARTUR","p":[1353,0,0,0,0],"f":[0,0,0,0],"o":[8,0,0,0,0],"tp":1353,"tf":0,"tr":-100},{"n":"BELA","p":[0,0,588,622,0],"f":[0,0,0,0],"o":[0,0,7,6,0],"tp":1210,"tf":0,"tr":0},{"n":"SHERRY","p":[0,0,0,1118,0],"f":[0,0,0,0],"o":[0,0,0,13,0],"tp":1118,"tf":0,"tr":0},{"n":"ANA PAULA","p":[347,116,243,297,0],"f":[0,0,0,0],"o":[32,13,25,35,0],"tp":1003,"tf":0,"tr":-14}];
+
+
+
+function renderTodos(){
+  const q=(document.getElementById('t-filter').value||'').toLowerCase();
+  const sv=document.getElementById('t-sort').value;
+  const tbody=document.getElementById('t-body');
+  const YC=['#8A6018','#1A5FA8','#0A7A52','#5A52C0','#C22B2A'];
+  const YLABELS=['2022','2023','2024','2025','2026 YTD'];
+  let rows=[...TODOS_DATA];
+  if(q) rows=rows.filter(r=>r.n.toLowerCase().includes(q));
+  if(sv==='tp') rows.sort((a,b)=>b.tp-a.tp);
+  else if(sv==='tf') rows.sort((a,b)=>b.tf-a.tf);
+  else if(sv==='tr') rows.sort((a,b)=>b.tr-a.tr);
+  else if(sv==='n') rows.sort((a,b)=>a.n.localeCompare(b.n));
+  else if(sv==='p25') rows.sort((a,b)=>(b.p[3]||0)-(a.p[3]||0));
+  document.getElementById('t-count').textContent=rows.length+' clientes';
+  const maxP=Math.max(...TODOS_DATA.map(r=>Math.max(...r.p)));
+  tbody.innerHTML=rows.map((r,i)=>{
+    const meta=META[r.n]||DM;
+    const tc=r.tr>10?'color:var(--green)':r.tr<-10?'color:var(--red)':'color:var(--text3)';
+    const ts=r.tr>10?'UP +':r.tr<-10?'DN ':'EQ ';
+    const bars=r.p.map((v,j)=>{
+      const bh=v?Math.max(2,Math.round(v/maxP*20)):0;
+      return '<span style="background:'+YC[j]+';height:'+bh+'px;width:7px;display:inline-block;border-radius:1px 1px 0 0" title="'+YLABELS[j]+': '+fmt(v)+' pcs"></span>';
+    }).join('');
+    const rowbg=i%2?'background:rgba(0,0,0,.02)':'';
+    return '<tr style="'+rowbg+';cursor:pointer" onclick="goCliente(\''+r.n+'\')">'
+      +'<td style="padding:6px 12px;font-weight:600;border-bottom:1px solid var(--border)">'
+      +'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+meta.c+';margin-right:6px;vertical-align:middle"></span>'+r.n+'</td>'
+      +r.p.map((v,j)=>'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);color:'+(v>0?YC[j]:'var(--text3)')+'">'+
+        (v>0?fmt(v):'&mdash;')+'</td>').join('')
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-weight:700">'+fmt(r.tp)+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--purple)">'+(r.tf>0?'R$'+Math.round(r.tf/1000)+'k':'&mdash;')+'</td>'
+      +'<td style="padding:5px 8px;text-align:center;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;'+tc+'">'+ts+Math.abs(r.tr)+'%</td>'
+      +'<td style="padding:4px 8px;text-align:center;border-bottom:1px solid var(--border)"><div style="display:flex;gap:2px;align-items:flex-end;height:22px">'+bars+'</div></td>'
+      +'<td style="padding:5px 8px;text-align:center;border-bottom:1px solid var(--border)">'
+      +'<button onclick="event.stopPropagation();goCliente(\''+r.n+'\');return false" '
+      +'style="padding:3px 10px;font-size:10px;border:1px solid var(--blue);border-radius:4px;color:var(--blue);background:none;cursor:pointer;white-space:nowrap">Ver</button></td>'
+      +'</tr>';
+  }).join('');
+}
+
+function goCliente(name){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pane-busca').classList.add('on');
+  document.querySelector('.tab-btn').classList.add('on');
+  document.getElementById('si').value=name;
+  sel(name);
+  window.scrollTo(0,0);
+}
+
+
+
+// ===== INSIGHTS DE LAVAGENS =====
+const LAV_TOTAL_FAT=6430775;
+
+function getInsights(r){
+  const ins=[];
+  const top=Object.entries(r.c||{}).sort((a,b)=>b[1]-a[1]);
+  const top1pct=top[0]&&r.v?top[0][1]/r.v*100:0;
+  const fatPct=r.v/6430775*100;
+  const a=r.a||{};
+  const v23=a['2023']||0,v24=a['2024']||0,v25=a['2025']||0,v26=a['2026']||0;
+  const trend=v24>0?((v25-v24)/v24*100):null;
+  const trend26=v25>0?((v26/v25*100)-100):null;
+
+  // Participacao no faturamento total
+  if(fatPct>30) ins.push({t:'DOMINANTE',d:'Representa '+fatPct.toFixed(0)+'% do faturamento total da Delta',c:'var(--blue)',bg:'rgba(26,95,168,.1)'});
+  else if(fatPct>10) ins.push({t:'RELEVANTE',d:'Representa '+fatPct.toFixed(0)+'% do faturamento total',c:'var(--blue)',bg:'rgba(26,95,168,.08)'});
+
+  // Concentracao de cliente
+  if(top1pct>90) ins.push({t:'CLIENTE UNICO',d:top[0][0]+' = '+top1pct.toFixed(0)+'% deste processo — risco de dependencia',c:'var(--red)',bg:'rgba(194,43,42,.08)'});
+  else if(top1pct>60) ins.push({t:'CONCENTRADO',d:top[0][0]+' com '+top1pct.toFixed(0)+'% do faturamento deste processo',c:'var(--amber)',bg:'rgba(154,90,8,.08)'});
+
+  // Tendencia 2024 -> 2025
+  if(trend!==null){
+    if(trend<-40) ins.push({t:'QUEDA FORTE',d:'Faturamento -'+Math.abs(trend).toFixed(0)+'% em 2025 vs 2024',c:'var(--red)',bg:'rgba(194,43,42,.08)'});
+    else if(trend<-15) ins.push({t:'QUEDA',d:'Faturamento -'+Math.abs(trend).toFixed(0)+'% em 2025 vs 2024',c:'var(--amber)',bg:'rgba(154,90,8,.08)'});
+    else if(trend>40) ins.push({t:'CRESCIMENTO',d:'Faturamento +'+trend.toFixed(0)+'% em 2025 vs 2024',c:'var(--green)',bg:'rgba(10,122,82,.1)'});
+    else if(trend>15) ins.push({t:'CRESCENDO',d:'Faturamento +'+trend.toFixed(0)+'% em 2025 vs 2024',c:'var(--green)',bg:'rgba(10,122,82,.08)'});
+  }
+
+  // 2026 tendencia
+  if(v26>0&&v25>0&&trend26!==null){
+    if(trend26>30) ins.push({t:'2026 FORTE',d:'2026 YTD ja +'+trend26.toFixed(0)+'% vs 2025',c:'var(--green)',bg:'rgba(10,122,82,.08)'});
+    else if(trend26<-50) ins.push({t:'2026 FRACO',d:'2026 YTD em -'+Math.abs(trend26).toFixed(0)+'% vs 2025',c:'var(--red)',bg:'rgba(194,43,42,.08)'});
+  }
+
+  // Alto valor/kg (processo premium por faturamento real)
+  if(r.fkg>20) ins.push({t:'ALTO VALOR',d:'R$'+r.fkg.toFixed(2)+'/kg de faturamento real — processo de alto valor agregado',c:'var(--purple)',bg:'rgba(90,82,192,.08)'});
+  else if(r.fkg<3&&r.v>30000) ins.push({t:'BAIXO VALOR/KG',d:'R$'+r.fkg.toFixed(2)+'/kg de faturamento — verificar se o volume compensa',c:'var(--amber)',bg:'rgba(154,90,8,.08)'});
+
+  // Volume sem expressao mas ativo
+  if(r.o<10&&r.v>0) ins.push({t:'BAIXA FREQUENCIA',d:'Apenas '+r.o+' OS no periodo — processo pouco utilizado',c:'var(--text3)',bg:'rgba(0,0,0,.05)'});
+
+  return ins;
+}
+
+function insHtml(ins){
+  if(!ins.length) return '<span style="color:var(--text3);font-size:10px">—</span>';
+  return ins.slice(0,3).map(i=>
+    '<span style="display:inline-block;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:'+i.bg+';color:'+i.c+';margin:1px 2px 1px 0;white-space:nowrap" title="'+i.d+'">'+i.t+'</span>'
+  ).join('');
+}
+
+// ===== LAVAGENS & CUSTOS =====
+const LAV_DATA={"TINGIMENTO REATIVO":{"v":2978815,"q":745628,"p":241520,"o":15410,"c":{"LABIOS DE MEL":411847.5399999997,"VAPE":310684.5599999998,"OSHAYA":277488.70999999956,"BLUMOND":275551.50999999954,"CONVÉS":228046.93999999898,"JUMA":181893.6199999999,"STREET":154094.74999999997,"DRY INDUSTRY":146051.11999999997},"a":{"2023":963907,"2024":920204,"2025":757037,"2026":337667},"fkg":12.33,"cat":"Tinturaria · Reativo"},"TINGIMENTO REATIVO ESPECIAL (BRILHANTE)":{"v":185988,"q":63882,"p":13637,"o":1722,"c":{"JUMA":34006.02000000001,"VAPE":27509.33999999999,"FAV":26729.379999999986,"OSHAYA":19457.74,"BLUMOND":14966.570000000002,"ZeN":9500.989999999998,"CONVÉS":9109.079999999994,"JULY KIDS":8328.569999999998},"a":{"2023":72738,"2024":51339,"2025":47948,"2026":13962},"fkg":13.64,"cat":"Tinturaria · Reativo Especial"},"ALVEJAMENTO (PT)":{"v":179659,"q":83602,"p":19660,"o":1132,"c":{"CONVÉS":39471.700000000004,"BLUMOND":22532.51,"JUMA":22136.87,"FAV":21598.33000000001,"OSHAYA":13565.389999999998,"DRY INDUSTRY":12840.25,"VAPE":9755.500000000002,"T.J.E CONFECÇÕES LTDA":9183.11},"a":{"2023":72105,"2024":50662,"2025":47129,"2026":9763},"fkg":9.14,"cat":"Lavanderia · Alvejamento"},"DESTROYER MÉDIO":{"v":38606,"q":19953,"p":3789,"o":272,"c":{"VAPE":26783.069999999992,"ARTE MODAS":2823.6900000000005,"ANGELA MARIA MONTORSE":2451.9500000000003,"FENIX INDUSTRIAL EIRELLI":1698.5,"AFETY CONFECÇÕES LTDA":1605.34,"ALEPO RIO BOUTIQUE LTDA":884.78,"LABIOS DE MEL":770.46,"TERRITORIO DOS VENTOS MODAS LTDA ME":730.9799999999999},"a":{"2023":14008,"2024":13915,"2025":6137,"2026":4546},"fkg":10.19,"cat":"Lavanderia · Destroyer"},"PIGMENT COLOR MAX":{"v":15085,"q":487,"p":423,"o":31,"c":{"ANA PAULA MC DE FARIA BOLSAS E ACESSORIOS":13283.180000000002,"CONVÉS":1802.22},"a":{"2023":3682,"2024":6307,"2025":4357,"2026":739},"fkg":35.66,"cat":"Tinturaria · Especiais"},"TINGIMENTO DIRETO":{"v":634534,"q":168609,"p":55419,"o":2169,"c":{"BLUMOND":94343.54999999999,"CONVÉS":83735.19000000008,"VAPE":64088.799999999974,"LABIOS DE MEL":60804.88000000003,"JULY KIDS":53966.280000000006,"DRY INDUSTRY":41722.5,"OSHAYA":40097.71000000001,"LILA KIDS":37784.77},"a":{"2023":179503,"2024":240419,"2025":165679,"2026":48933},"fkg":11.45,"cat":"Tinturaria · Direto"},"DELAVE (C)":{"v":2427,"q":598,"p":185,"o":9,"c":{"ALEPO RIO BOUTIQUE LTDA":1061.4,"ANDRÉ  GOMES |V.A.|":886.65,"ARTE MODAS":347.0,"ANGELA MARIA MONTORSE":131.64},"a":{"2023":1365,"2024":218,"2025":844},"fkg":13.12,"cat":"Outros"},"ONE FIX":{"v":35654,"q":16486,"p":8126,"o":170,"c":{"CONVÉS":26643.480000000003,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":2360.3599999999997,"D & M UNIFORMES":1773.5,"JULY KIDS":1425.73,"VAPE":937.8,"A D G DA SILVA EIRELLI":645.25,"AFETY CONFECÇÕES LTDA":468.0,"ANDRÉ  GOMES |V.A.|":455.0},"a":{"2023":9487,"2024":10630,"2025":6452,"2026":9085},"fkg":4.39,"cat":"Lavanderia · One Washed/Fix"},"DESTROYER CLARO":{"v":10264,"q":3505,"p":886,"o":95,"c":{"ANGELA MARIA MONTORSE":5111.29,"VAPE":2872.4300000000007,"ARTE MODAS":2138.83,"ZeN":89.06,"CADANHA FACCAO DE ROUPAS LTDA":42.4,"FENIX INDUSTRIAL EIRELLI":6.0,"TROOMP":4.16},"a":{"2023":4306,"2024":4781,"2025":448,"2026":729},"fkg":11.58,"cat":"Lavanderia · Destroyer"},"DESTROYER ESCURO":{"v":10510,"q":3428,"p":1360,"o":119,"c":{"ANGELA MARIA MONTORSE":5654.889999999999,"ARTE MODAS":1486.8500000000001,"AFETY CONFECÇÕES LTDA":917.72,"CARELO FACCOES IND. E COM. DE ROUPAS LTDA":638.4,"TERRITORIO DOS VENTOS MODAS LTDA ME":514.3000000000001,"VAPE":396.10999999999996,"FENIX INDUSTRIAL EIRELLI":369.5,"LABIOS DE MEL":294.56},"a":{"2023":4457,"2024":4037,"2025":1533,"2026":483},"fkg":7.73,"cat":"Lavanderia · Destroyer"},"ONE RESINADO":{"v":1152,"q":393,"p":216,"o":7,"c":{"ARTE MODAS":1145.82,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":4.0,"ANGELA MARIA MONTORSE":2.01},"a":{"2023":1152},"fkg":5.33,"cat":"Lavanderia · One Washed/Fix"},"ONE WASHED":{"v":26341,"q":11400,"p":5254,"o":136,"c":{"VAPE":15366.169999999993,"CONVÉS":5022.920000000001,"JULY KIDS":1811.73,"ALEPO RIO BOUTIQUE LTDA":1179.75,"TOREG CAMISARIA LTDA":632.9,"A D G DA SILVA EIRELLI":417.6,"JLVR":357.0,"JUMA":279.0},"a":{"2023":13845,"2024":5297,"2025":5867,"2026":1331},"fkg":5.01,"cat":"Lavanderia · One Washed/Fix"},"TINGIMENTO CATIONIZADO":{"v":349494,"q":96142,"p":30791,"o":650,"c":{"CONVÉS":313796.3599999998,"CANAL LIVRE":14068.07,"ARMADILLO":6080.990000000002,"OSHAYA":3105.8500000000004,"BLUMOND":2655.5400000000004,"CONFECCOES A BRANCO LTDA - EPP":2619.6800000000003,"REPROCESSO":2437.5200000000004,"STREET":1467.75},"a":{"2023":138430,"2024":97308,"2025":98971,"2026":14785},"fkg":11.35,"cat":"Tinturaria · Cationizado"},"SOFT FREE":{"v":67654,"q":54536,"p":15904,"o":437,"c":{"ARMADILLO":32053.73,"CONVÉS":21234.000000000015,"KLEMS CONFECCOES LTDA":6987.400000000001,"JLVR":6121.219999999998,"VAPE":615.0,"ARTE MODAS":474.1,"RAVAGNANI CONFECCOES LTDA ME":148.5,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":11.6},"a":{"2023":11821,"2024":34293,"2025":19260,"2026":2280},"fkg":4.25,"cat":"Lavanderia · Soft"},"SOFT":{"v":977278,"q":1083851,"p":322240,"o":9901,"c":{"LABIOS DE MEL":203968.4199999997,"CONVÉS":186826.7700000006,"VAPE":133832.91999999952,"JLVR":76404.29999999996,"ARMADILLO":63118.09000000001,"CR MANZO":46514.50000000003,"TOREG CAMISARIA LTDA":35463.62000000001,"CANAL LIVRE":32438.129999999997},"a":{"2023":256881,"2024":275091,"2025":330992,"2026":114313},"fkg":3.03,"cat":"Lavanderia · Soft"},"SUPER SOFT (AMACIADO EXTRA SILICONADO)":{"v":37935,"q":20035,"p":4267,"o":149,"c":{"JUMA":19956.18,"ARMADILLO":13874.65,"CARELO FACCOES IND. E COM. DE ROUPAS LTDA":2439.05,"CONVÉS":1318.12,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":238.25,"TERRAS DE AVENTURA INDUSTRIA DE ARTIGOS ESPORTIVOS S.A":28.9,"VAPE":19.25,"ARTE MODAS":15.5},"a":{"2023":859,"2024":6649,"2025":23438,"2026":6989},"fkg":8.89,"cat":"Lavanderia · Soft"},"BRANCO AMERICANO":{"v":16623,"q":6650,"p":1444,"o":63,"c":{"ARMADILLO":16606.95,"JLVR":10.8,"JUMA":2.86,"OSHAYA":2.81,"CONTRA-AMOSTRA (5 ESTRELAS)":0.0},"a":{"2023":5303,"2024":6400,"2025":4296,"2026":624},"fkg":11.51,"cat":"Lavanderia · Alvejamento"},"HIPERDESTROYER MÉDIO":{"v":7011,"q":1499,"p":580,"o":30,"c":{"ARTE MODAS":6596.199999999999,"VAPE":390.6,"CONVÉS":10.5,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":7.26,"CADANHA FACCAO DE ROUPAS LTDA":6.86},"a":{"2023":5940,"2024":681,"2025":391},"fkg":12.09,"cat":"Lavanderia · Destroyer"},"SUPER STONE (JEANS)":{"v":1015,"q":295,"p":135,"o":53,"c":{"TOREG CAMISARIA LTDA":385.4,"ZeN":351.19999999999993,"CARELO FACCOES IND. E COM. DE ROUPAS LTDA":131.87,"CONVÉS":60.8,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":21.75,"VAPE":19.38,"JULY KIDS":18.7,"LABIOS DE MEL":9.24},"a":{"2023":423,"2024":153,"2025":111,"2026":328},"fkg":7.52,"cat":"Lavanderia · Stone"},"DESTROYER MÉDIO (PMGT)":{"v":3975,"q":551,"p":275,"o":14,"c":{"ARTE MODAS":3850.46,"LABIOS DE MEL":124.77},"a":{"2023":3975},"fkg":14.45,"cat":"Lavanderia · Destroyer"},"TINGIMENTO DIRETO ESTONADO":{"v":33449,"q":5661,"p":2678,"o":101,"c":{"LABIOS DE MEL":16077.16,"CONVÉS":13282.789999999999,"CANAL LIVRE":1552.48,"OACTTUS INDÚSTRIA E COMÉRCIO DE ROUPAS LTDA ME":1216.0,"ARTE MODAS":912.5799999999999,"JLVR":283.03999999999996,"VAPE":52.93,"TERRAS DE AVENTURA INDUSTRIA DE ARTIGOS ESPORTIVOS S.A":27.0},"a":{"2023":7409,"2024":23580,"2025":2460},"fkg":12.49,"cat":"Tinturaria · Direto Estonado"},"HIPERDESTROYER":{"v":4415,"q":832,"p":424,"o":24,"c":{"CADANHA FACCAO DE ROUPAS LTDA":2394.96,"ARTE MODAS":1066.8500000000001,"LABIOS DE MEL":454.96,"ANGELA MARIA MONTORSE":443.94,"JULY KIDS":40.48,"ZeN":8.82,"CONVÉS":5.0},"a":{"2023":1219,"2024":2734,"2025":9,"2026":453},"fkg":10.41,"cat":"Lavanderia · Destroyer"},"HIPERDESTROYER CLARO":{"v":5313,"q":661,"p":319,"o":17,"c":{"ARTE MODAS":2777.2799999999997,"CADANHA FACCAO DE ROUPAS LTDA":2132.1,"CONVÉS":391.0,"ANGELA MARIA MONTORSE":12.15},"a":{"2023":2751,"2024":2550,"2025":12},"fkg":16.66,"cat":"Lavanderia · Destroyer"},"SUPER STONE (PT)":{"v":14663,"q":4294,"p":1685,"o":135,"c":{"CADANHA FACCAO DE ROUPAS LTDA":5292.58,"KLEMS CONFECCOES LTDA":3075.5,"LABIOS DE MEL":3034.37,"JULY KIDS":1113.03,"ARTE MODAS":851.41,"TOREG CAMISARIA LTDA":351.0,"ZeN":328.29999999999995,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":224.1},"a":{"2023":4320,"2024":8072,"2025":1456,"2026":816},"fkg":8.7,"cat":"Lavanderia · Stone"},"TINGIMENTO REATIVO ESTONADO":{"v":49049,"q":9583,"p":3527,"o":104,"c":{"CONVÉS":24474.74,"OSHAYA":11283.300000000001,"CANAL LIVRE":9091.309999999996,"LILA KIDS":3115.5300000000007,"TROOMP":440.3,"LUMI CONFECÇÕES LTDA":408.0,"REPROCESSO":141.45,"LABIOS DE MEL":50.24},"a":{"2023":10407,"2024":15885,"2025":11502,"2026":11255},"fkg":13.91,"cat":"Tinturaria · Reativo Estonado"},"DESTROYER CLARO (PMGT)":{"v":1101,"q":153,"p":73,"o":11,"c":{"ARTE MODAS":1003.12,"LABIOS DE MEL":97.86},"a":{"2023":1101},"fkg":15.08,"cat":"Lavanderia · Destroyer"},"ALVEJAMENTO (JEANS)":{"v":1394,"q":461,"p":192,"o":16,"c":{"OSHAYA":758.6,"VAPE":332.61,"ANGELA MARIA MONTORSE":227.48,"TROOMP":53.1,"ARTE MODAS":13.170000000000002,"ZeN":9.0},"a":{"2023":17,"2024":401,"2025":976},"fkg":7.26,"cat":"Lavanderia · Alvejamento"},"SOFT C/ SABÃO":{"v":45548,"q":30627,"p":9340,"o":454,"c":{"LABIOS DE MEL":9593.799999999997,"CONVÉS":7968.699999999999,"STREET":5519.44,"JULY KIDS":3481.9599999999996,"VAPE":2928.7,"CANAL LIVRE":2780.9,"ARMADILLO":2219.6200000000003,"VILLU MODAS E CONFECÇÕES LTDA":1992.9999999999998},"a":{"2023":20040,"2024":7394,"2025":13474,"2026":4639},"fkg":4.88,"cat":"Lavanderia · Soft"},"POLIMERIZAR":{"v":6785,"q":15571,"p":4808,"o":26,"c":{"CONVÉS":3120.62,"LABIOS DE MEL":2349.3199999999997,"VAPE":1257.8200000000002,"ARTE MODAS":57.4},"a":{"2023":4484,"2024":1676,"2025":38,"2026":588},"fkg":1.41,"cat":"Outros"},"HIPERDESTROYER (ABR)":{"v":5763,"q":844,"p":555,"o":19,"c":{"VAPE":3808.55,"TROOMP":1131.31,"CANAL LIVRE":688.8000000000001,"CONVÉS":86.5,"J SCHINCARIOL EIRELI ME":16.17,"AFETY CONFECÇÕES LTDA":14.22,"ARTE MODAS":10.55,"T.J.E CONFECÇÕES LTDA":6.6},"a":{"2023":1831,"2024":21,"2025":93,"2026":3819},"fkg":10.38,"cat":"Lavanderia · Destroyer"},"SOFT C/ PURGA":{"v":26423,"q":10281,"p":3349,"o":302,"c":{"BLUMOND":6902.100000000002,"VAPE":4603.37,"CONVÉS":3937.02,"T.J.E CONFECÇÕES LTDA":2229.9500000000003,"CANAL LIVRE":2133.7,"STREET":1870.1999999999998,"JLVR":1541.7,"FAV":912.2},"a":{"2023":5264,"2024":7047,"2025":10292,"2026":3820},"fkg":7.89,"cat":"Lavanderia · Soft"},"TINGIMENTO ESTONADO CATIONIZADO":{"v":134967,"q":28340,"p":9206,"o":686,"c":{"CONVÉS":119345.86000000002,"CANAL LIVRE":7394.860000000002,"J SCHINCARIOL EIRELI ME":2832.18,"OSHAYA":2530.4900000000002,"HAYRA CONFECCOES IND. E COM. LTDA":1531.46,"TROOMP":1038.45,"VAPE":113.4,"T.J.E CONFECÇÕES LTDA":94.72},"a":{"2023":94897,"2024":32318,"2025":4736,"2026":3016},"fkg":14.66,"cat":"Tinturaria · Cationizado Estonado"},"SOFT ORGANICO | MENTA (SUSTENTAVEL)":{"v":55983,"q":11070,"p":6253,"o":131,"c":{"CANAL LIVRE":31954.82,"LABIOS DE MEL":21826.880000000005,"TERRAS DE AVENTURA INDUSTRIA DE ARTIGOS ESPORTIVOS S.A":2194.7200000000003,"JLVR":5.2,"VAPE":1.78},"a":{"2023":14359,"2024":18238,"2025":19267,"2026":4120},"fkg":8.95,"cat":"Tinturaria · Especiais"},"TINGIMENTO REATIVO ESTONADO ESPECIAL (BRILHANTE)":{"v":6280,"q":2540,"p":401,"o":37,"c":{"FAV":3165.28,"VAPE":2082.6400000000003,"CANAL LIVRE":1031.4,"RANY CONFECÇÕES DE ROUPAS LTDA":0.22,"ZeN":0.18},"a":{"2023":1488,"2024":1662,"2025":3129,"2026":0},"fkg":15.66,"cat":"Tinturaria · Reativo Especial"},"TINGIMENTO REATIVO (TENCEL)":{"v":190259,"q":29900,"p":11802,"o":548,"c":{"OSHAYA":104473.52999999994,"BLUMOND":23157.780000000002,"CONVÉS":16043.850000000002,"JLVR":15046.99,"T.J.E CONFECÇÕES LTDA":10567.3,"CANAL LIVRE":9703.0,"RANY CONFECÇÕES DE ROUPAS LTDA":8638.91,"LABIOS DE MEL":1080.05},"a":{"2023":43506,"2024":54665,"2025":48336,"2026":43752},"fkg":16.12,"cat":"Tinturaria · Reativo Tencel"},"TINGIMENTO REATIVO TENCEL (BRILHANTE)":{"v":5348,"q":805,"p":354,"o":27,"c":{"OSHAYA":4768.12,"BLUMOND":307.84,"CONFECCOES NEW 5 LTDA":213.53,"RANY CONFECÇÕES DE ROUPAS LTDA":53.8,"LABIOS DE MEL":4.91},"a":{"2023":1880,"2024":160,"2025":3308},"fkg":15.11,"cat":"Tinturaria · Reativo Tencel"},"TINGIMENTO DIRETO  (TENCEL)":{"v":28746,"q":4807,"p":1854,"o":64,"c":{"OSHAYA":14938.23,"BLUMOND":8471.46,"RANY CONFECÇÕES DE ROUPAS LTDA":2545.8,"JLVR":1725.0,"CONVÉS":1049.66,"LABIOS DE MEL":9.1,"VAPE":6.9},"a":{"2023":8229,"2024":15407,"2025":4523,"2026":587},"fkg":15.5,"cat":"Tinturaria · Direto Tencel"},"ALVEJAMENTO (TENCEL)":{"v":3969,"q":957,"p":312,"o":17,"c":{"BLUMOND":3769.87,"RANY CONFECÇÕES DE ROUPAS LTDA":198.74},"a":{"2023":726,"2024":2431,"2025":69,"2026":742},"fkg":12.72,"cat":"Lavanderia · Alvejamento"},"BIOPOLIMENTO":{"v":552,"q":985,"p":648,"o":17,"c":{"AFETY CONFECÇÕES LTDA":216.0,"RANY CONFECÇÕES DE ROUPAS LTDA":144.08,"REPROCESSO":118.56,"SUIT CAMISARIA LTDA - ME":56.83,"VAPE":8.03,"J SCHINCARIOL EIRELI ME":4.24,"CONVÉS":3.31,"OSHAYA":0.45},"a":{"2023":277,"2024":52,"2025":222},"fkg":0.85,"cat":"Outros"},"TINGIMENTO RETRODYE":{"v":10957,"q":1148,"p":551,"o":33,"c":{"OSHAYA":6524.699999999999,"REPROCESSO":2738.7999999999997,"CONVÉS":1583.8100000000004,"HAYRA CONFECCOES IND. E COM. LTDA":68.16,"VAPE":37.65,"TERRAS DE AVENTURA INDUSTRIA DE ARTIGOS ESPORTIVOS S.A":4.0,"DELTA TINTURARIA EIRELI":0.18},"a":{"2023":10815,"2024":68,"2025":75},"fkg":19.89,"cat":"Tinturaria · Especiais"},"REMOVER TINGIMENTO (C)":{"v":356,"q":72,"p":25,"o":15,"c":{"BLUMOND":224.0,"JULY KIDS":90.06,"CONVÉS":31.91,"LILA KIDS":9.709999999999999,"CONTRA-AMOSTRA (5 ESTRELAS)":0.02},"a":{"2023":0,"2024":356},"fkg":14.24,"cat":"Outros"},"SOFT  (TECIDO JERRY : VICUNHA )":{"v":45953,"q":53387,"p":20506,"o":208,"c":{"CONVÉS":45074.479999999996,"VAPE":878.4},"a":{"2023":7538,"2024":19952,"2025":14570,"2026":3893},"fkg":2.24,"cat":"Lavanderia · Soft"},"TINGIMENTO REATIVO ( TECIDO : JERRY : VICNHA )":{"v":40826,"q":9457,"p":3977,"o":90,"c":{"CONVÉS":40559.96,"VAPE":265.6},"a":{"2023":6703,"2026":34123},"fkg":10.27,"cat":"Tinturaria · Reativo"},"TINGIMENTO ESTONADO CATIONIZADO (BRILHANTE)":{"v":1930,"q":420,"p":131,"o":21,"c":{"CONVÉS":1929.56},"a":{"2023":200,"2024":1730},"fkg":14.73,"cat":"Tinturaria · Reativo Especial"},"TINGIMENTO CATIONIZADO (BRILHANTE)":{"v":9614,"q":2961,"p":700,"o":11,"c":{"CONVÉS":9605.85,"REPROCESSO":7.81},"a":{"2023":2415,"2024":6686,"2025":513},"fkg":13.73,"cat":"Tinturaria · Reativo Especial"},"REMOVER TINGIMENTO (H)":{"v":1041,"q":327,"p":94,"o":11,"c":{"REPROCESSO":589.34,"LABIOS DE MEL":337.8,"BLUMOND":46.699999999999996,"DELTA TINTURARIA EIRELI":46.34,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":11.0,"OSHAYA":6.17,"CR MANZO":2.3,"CONVÉS":1.1},"a":{"2023":485,"2024":102,"2025":116,"2026":338},"fkg":11.07,"cat":"Outros"},"ORGANIC COLOR (SUSTENTÁVEL)":{"v":46863,"q":3865,"p":1841,"o":80,"c":{"LABIOS DE MEL":45974.65000000001,"REPROCESSO":754.4,"TERRAS DE AVENTURA INDUSTRIA DE ARTIGOS ESPORTIVOS S.A":128.42,"DELTA TINTURARIA EIRELI":5.45,"CONTRA-AMOSTRA (5 ESTRELAS)":0.01},"a":{"2023":114,"2024":29376,"2025":14138,"2026":3235},"fkg":25.46,"cat":"Tinturaria · Especiais"},"NEUTRALIZAR (USED)":{"v":398,"q":201,"p":87,"o":8,"c":{"ANGELA MARIA MONTORSE":386.61,"OSHAYA":9.18,"RELLUS INDUSTRIA E COMERCIO DE ROUPAS EIRELI":1.73},"a":{"2023":2,"2024":386,"2025":9},"fkg":4.57,"cat":"Outros"},"SOFT SILICONADO  (RCH)":{"v":400,"q":279,"p":57,"o":5,"c":{"JUMA":364.5,"CONVÉS":34.0,"SUIT CAMISARIA LTDA - ME":1.9},"a":{"2023":2,"2024":34,"2025":364},"fkg":7.02,"cat":"Lavanderia · Soft"},"ACABAMENTO C/ SILICONE":{"v":1325,"q":3117,"p":1230,"o":3,"c":{"VAPE":980.0,"LABIOS DE MEL":307.5,"ARMADILLO":37.5},"a":{"2024":38,"2025":1288},"fkg":1.08,"cat":"Lavanderia · One Washed/Fix"},"TINGIMENTO DIRETO ( LINHO )":{"v":7566,"q":1460,"p":540,"o":20,"c":{"BLUMOND":7565.599999999999},"a":{"2024":6105,"2025":1461},"fkg":14.01,"cat":"Tinturaria · Direto"},"TINGIMENTO REATIVO ( LINHO )":{"v":5984,"q":1513,"p":560,"o":24,"c":{"BLUMOND":5829.57,"OSHAYA":132.0,"REPROCESSO":22.56},"a":{"2024":5444,"2025":541},"fkg":10.69,"cat":"Tinturaria · Reativo"},"ALVEJAMENTO ESPECIAL (PT)":{"v":23959,"q":4395,"p":1744,"o":51,"c":{"CANAL LIVRE":9670.1,"OSHAYA":6810.63,"TROOMP":4596.3099999999995,"STREET":2217.25,"ARMADILLO":601.8,"CONVÉS":62.44,"DELTA TINTURARIA EIRELI":0.0},"a":{"2024":4430,"2025":19049,"2026":480},"fkg":13.74,"cat":"Lavanderia · Alvejamento"},"TINGIMENTO STONED":{"v":18422,"q":2214,"p":863,"o":219,"c":{"CONVÉS":8142.85,"LABIOS DE MEL":7725.290000000001,"OSHAYA":2074.16,"DELTA TINTURARIA EIRELI":154.08,"ARMADILLO":136.43,"VAPE":94.55999999999999,"GLITTER JEANS CONFECÇÃO LTDA":76.11,"CANAL LIVRE":10.25},"a":{"2025":5104,"2026":13318},"fkg":21.35,"cat":"Tinturaria · Estonado"},"SOFT WASHED":{"v":6609,"q":3147,"p":1344,"o":12,"c":{"CONVÉS":6608.700000000001},"a":{"2025":6609},"fkg":4.92,"cat":"Lavanderia · Soft"},"TINGIMENTO PIGMENTO CORATEX":{"v":1120,"q":17,"p":25,"o":5,"c":{"ANA PAULA MC DE FARIA BOLSAS E ACESSORIOS":1109.31,"CONVÉS":10.66},"a":{"2025":1120},"fkg":44.8,"cat":"Tinturaria · Especiais"},"TINGIMENTO DIRETO (JERRY)":{"v":7425,"q":1599,"p":676,"o":9,"c":{"CONVÉS":7271.0,"DELTA TINTURARIA EIRELI":153.75},"a":{"2026":7425},"fkg":10.98,"cat":"Tinturaria · Direto"}};
+const CAT_COLOR={"Lavanderia · Soft":"#0A7A52","Lavanderia · Stone":"#7A5A3A","Lavanderia · Destroyer":"#C22B2A","Lavanderia · One Washed/Fix":"#5A52C0","Lavanderia · Alvejamento":"#3A7AB0","Tinturaria · Reativo":"#1A5FA8","Tinturaria · Cationizado":"#6A3A90","Tinturaria · Direto":"#8A6018","Tinturaria · Reativo Tencel":"#5A52C0","Tinturaria · Especiais":"#9A5A08","Tinturaria · Estonado":"#7A5A3A","Tinturaria · Reativo Estonado":"#3A6A8A","Tinturaria · Cationizado Estonado":"#6A3A60","Tinturaria · Direto Estonado":"#8A4018","Tinturaria · Direto Tencel":"#4A6A90","Tinturaria · Reativo Especial":"#2A4A80","Outros":"#888"};
+
+function renderLav(){
+  const q=(document.getElementById('lav-filter').value||'').toLowerCase();
+  const sv=document.getElementById('lav-sort').value;
+  const cf=document.getElementById('lav-cat').value;
+  const tbody=document.getElementById('lav-body');
+  let rows=Object.entries(LAV_DATA).map(([n,d])=>Object.assign({n},d));
+  if(q) rows=rows.filter(r=>r.n.toLowerCase().includes(q));
+  if(cf) rows=rows.filter(r=>r.cat&&r.cat.startsWith(cf));
+  if(sv==='v') rows.sort((a,b)=>b.v-a.v);
+  else if(sv==='q') rows.sort((a,b)=>b.q-a.q);
+  else if(sv==='o') rows.sort((a,b)=>b.o-a.o);
+  else if(sv==='fkg') rows.sort((a,b)=>b.fkg-a.fkg);
+  else if(sv==='cat') rows.sort((a,b)=>(a.cat||'').localeCompare(b.cat||'')||b.v-a.v);
+  else rows.sort((a,b)=>a.n.localeCompare(b.n));
+  const totV=rows.reduce((s,r)=>s+r.v,0);
+  const totO=rows.reduce((s,r)=>s+r.o,0);
+  const totQ=rows.reduce((s,r)=>s+r.q,0);
+  const totK=rows.reduce((s,r)=>s+r.p,0);
+  document.getElementById('lav-count').textContent=rows.length+' processos';
+  const se=document.getElementById('lav-summary');
+  if(se)se.innerHTML=[['Faturamento Real','R$'+Math.round(totV/1000)+'k','k23'],['OS',fmt(totO),'k25'],['Pecas',fmt(totQ),'k24'],['KG',fmt(totK),'k22']].map(([l,v,c])=>'<div class="kpi '+c+'" style="padding:10px 14px"><div class="kl">'+l+'</div><div class="kv" style="font-size:18px">'+v+'</div></div>').join('');
+  tbody.innerHTML=rows.map((r,i)=>{
+    const cc=CAT_COLOR[r.cat]||'#888';
+    const cl=(r.cat||'').split('·')[1]||r.cat||'';
+    const top=Object.entries(r.c||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([c])=>'<span style="display:inline-block;background:rgba(0,0,0,.06);border-radius:3px;padding:1px 5px;font-size:9px;margin:1px">'+c+'</span>').join('');
+    const rb=i%2?'background:rgba(0,0,0,.015)':'';
+    const ns=r.n.replace(/'/g,"\\'");
+    return '<tr style="'+rb+';cursor:pointer" onclick="showLavDetail(\''+ns+'\')">'
+      +'<td style="padding:6px 12px;border-bottom:1px solid var(--border);font-weight:600">'+r.n+'</td>'
+      +'<td style="padding:5px 8px;border-bottom:1px solid var(--border)"><span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+cc+'22;color:'+cc+';font-weight:600;white-space:nowrap">'+cl.trim()+'</span></td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">'+r.o+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">'+fmt(r.q)+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">'+fmt(r.p)+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-weight:600;color:var(--purple)">R$'+Math.round(r.v/1000)+'k</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">R$'+r.fkg.toFixed(2)+'</td>'
+      
+      
+      +'<td style="padding:5px 8px;border-bottom:1px solid var(--border)">'+insHtml(getInsights(r))+'</td>'
+      +'<td style="padding:5px 12px;border-bottom:1px solid var(--border)">'+top+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function showLavDetail(name){
+  const d=LAV_DATA[name];if(!d)return;
+  const cc=CAT_COLOR[d.cat]||'#888';
+  const top=Object.entries(d.c||{}).sort((a,b)=>b[1]-a[1]);
+  const mx=top[0]?top[0][1]:1;
+
+  document.getElementById('lav-det-title').innerHTML='<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:'+cc+'22;color:'+cc+';font-weight:600;margin-right:8px">'+(d.cat||'')+'</span>'+name;
+  document.getElementById('lav-det-body').innerHTML=
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">'
+    +[['OS',d.o,'k23'],['Pecas',fmt(d.q),'k24'],['KG',fmt(d.p),'k22'],
+      ['Fat. Real','R$'+Math.round(d.v).toLocaleString('pt-BR'),'k25'],
+      ['R$/kg faturado','R$'+d.fkg.toFixed(2),'k25'],
+      ['R$/kg fat. real','R$'+d.fkg.toFixed(2),'k25']].map(([l,v,c])=>
+      '<div class="kpi '+c+'" style="padding:8px 12px"><div class="kl">'+l+'</div><div class="kv" style="font-size:15px">'+v+'</div></div>').join('')+'</div>'
+    +(mg!==null?'<div style="padding:9px 14px;margin-bottom:12px;border-radius:6px;background:'+(mg>=0?'rgba(10,122,82,.08)':'rgba(194,43,42,.08)')+';border-left:3px solid '+(mg>=0?'var(--green)':'var(--red)')+'"><b>Margem fat. vs custo tabela:</b> '+(mg>=0?'+':'')+mg.toFixed(2)+'/kg &mdash; '+(mg>=0?'acima da tabela':'ABAIXO da tabela &mdash; revisar precificacao')+'</div>':'')
+    +(getInsights(d).length?'<div style="margin-bottom:12px">'+getInsights(d).map(i=>'<div style="display:flex;align-items:flex-start;gap:8px;padding:7px 10px;margin-bottom:4px;border-radius:5px;background:'+i.bg+'"><span style="font-size:9px;font-weight:700;color:'+i.c+';padding:2px 6px;border-radius:3px;background:rgba(255,255,255,.5);white-space:nowrap">'+i.t+'</span><span style="font-size:11px;color:var(--text2)">'+i.d+'</span></div>').join('')+'</div>':'')
+    +'<div style="font-size:11px;font-weight:600;margin-bottom:8px">Clientes que usam este processo:</div>'
+    +top.map(([c,v])=>'<div style="margin-bottom:7px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px"><b>'+c+'</b><span style="color:var(--purple)">R$'+Math.round(v).toLocaleString('pt-BR')+'</span></div><div style="height:6px;background:var(--bg3);border-radius:3px"><div style="height:6px;border-radius:3px;background:'+cc+';width:'+(v/mx*100)+'%"></div></div></div>').join('')
+    +'<div style="font-size:10px;color:var(--text3);margin-top:12px;padding-top:8px;border-top:1px solid var(--border)">Fat. por ano: '+Object.entries(d.a||{}).sort().map(([a,v])=>'<b>'+a+':</b> R$'+Math.round(v).toLocaleString('pt-BR')).join(' &middot; ')+'</div>';
+  document.getElementById('lav-detail').style.display='block';
+}
+
+
+// ===== INSIGHTS TAB =====
+let insChartsI={};
+function mkI(id,type,data,opts){
+  const el=document.getElementById(id);if(!el)return;
+  if(insChartsI[id])insChartsI[id].destroy();
+  insChartsI[id]=new Chart(el,{type,data,options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{backgroundColor:'rgba(248,247,244,.97)',titleColor:'#1A1820',bodyColor:'#4A4756',borderColor:'rgba(0,0,0,.12)',borderWidth:1},...(opts.pl||{})},scales:opts.sc||undefined}});
+}
+
+function renderInsights(){
+  const YC={"2023":"#1A5FA8","2024":"#0A7A52","2025":"#5A52C0","2026":"#C22B2A"};
+  const ANOS4=['2023','2024','2025','2026'];
+
+  // ── Build client fat summary ──────────────────────────
+  const clis=Object.keys(CI).map(n=>{
+    const fd=FAT_REAL[n]||{};
+    const f23=fd['2023']||0,f24=fd['2024']||0,f25=fd['2025']||0,f26=fd['2026']||0;
+    const ftot=f23+f24+f25+f26;
+    const pct25=f23>0?((f25-f23)/f23*100):null;
+    const cd=CI[n]||{};
+    const p25=(cd['2025']||{}).pcs||0;
+    return {n,f23,f24,f25,f26,ftot,pct25,p25};
+  }).filter(c=>c.ftot>1000);
+
+  const tot25=clis.reduce((s,c)=>s+c.f25,0);
+  const sorted25=[...clis].sort((a,b)=>b.f25-a.f25);
+
+  // ── KPI CARDS ─────────────────────────────────────────
+  const totFat=clis.reduce((s,c)=>s+c.ftot,0);
+  const nCliAtivos=clis.filter(c=>c.f25>0||c.f26>0).length;
+  const top3pct=sorted25.slice(0,3).reduce((s,c)=>s+c.f25,0)/tot25*100;
+  const nCrescendo=clis.filter(c=>c.pct25!==null&&c.pct25>10).length;
+  const nCaindo=clis.filter(c=>c.pct25!==null&&c.pct25<-10).length;
+  const lavNegMg=Object.values(LAV_DATA).filter(d=>d.fkg<3&&d.v>20000).length;
+  document.getElementById('ins-kpis').innerHTML=[
+    ['Fat. Total 2023-2026','R$'+Math.round(totFat/1000)+'k','k23'],
+    ['Clientes Ativos',''+nCliAtivos+' clientes','k24'],
+    ['Conc. Top 3',top3pct.toFixed(0)+'% (2025)','k25'],
+    ['Em Crescimento','+'+nCrescendo+' clientes','k24'],
+    ['Processos Baixo R$/kg',''+lavNegMg+' processos','k26']
+  ].map(([l,v,c])=>'<div class="kpi '+c+'"><div class="kl">'+l+'</div><div class="kv" style="font-size:17px">'+v+'</div></div>').join('');
+
+  // ── ALERTAS CRITICOS ──────────────────────────────────
+  const alerts=[];
+  // Top cliente concentracao
+  if(sorted25[0]&&tot25>0){const p=sorted25[0].f25/tot25*100;if(p>35)alerts.push({lvl:'CRITICO',icon:'🔴',msg:'<b>'+sorted25[0].n+'</b> representa '+p.toFixed(0)+'% do faturamento 2025 — risco de concentracao elevado'});}
+  // Queda dos maiores clientes
+  const grandes=clis.filter(c=>c.f23>100000&&c.pct25!==null&&c.pct25<-20);
+  grandes.forEach(c=>alerts.push({lvl:'ATENCAO',icon:'🟡',msg:'<b>'+c.n+'</b>: queda de '+Math.abs(c.pct25).toFixed(0)+'% no faturamento (R$'+Math.round(c.f23/1000)+'k → R$'+Math.round(c.f25/1000)+'k)'}));
+  // Processos abaixo da tabela
+  const lavBaixo=Object.entries(LAV_DATA).filter(([,d])=>d.fkg<3.5&&d.v>30000);
+  lavBaixo.forEach(([n,d])=>alerts.push({lvl:'ATENCAO',icon:'🟡',msg:'<b>'+n+'</b>: R$'+d.fkg.toFixed(2)+'/kg faturado — verificar se margem e volume justificam o processo'}));
+  // Crescimento forte 2026
+  const fast26=clis.filter(c=>c.f25>0&&c.f26>0&&(c.f26/c.f25)>0.6);
+  if(fast26.length)alerts.push({lvl:'POSITIVO',icon:'🟢',msg:'2026 YTD em ritmo forte: '+fast26.slice(0,3).map(c=>'<b>'+c.n+'</b>').join(', ')+' ja com mais de 60% do faturamento 2025'});
+
+  document.getElementById('ins-alertas').innerHTML=alerts.map(a=>'<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 14px;margin-bottom:6px;border-radius:7px;background:'+(a.lvl==='CRITICO'?'rgba(194,43,42,.08)':a.lvl==='POSITIVO'?'rgba(10,122,82,.08)':'rgba(154,90,8,.08)')+';border-left:3px solid '+(a.lvl==='CRITICO'?'var(--red)':a.lvl==='POSITIVO'?'var(--green)':'var(--amber)')+'"><span style="font-size:14px">'+a.icon+'</span><span style="font-size:11px;color:var(--text2);line-height:1.5">'+a.msg+'</span></div>').join('');
+
+  // ── ABC ───────────────────────────────────────────────
+  let cum=0;const abcMap={};
+  sorted25.filter(c=>c.f25>0).forEach(c=>{
+    cum+=c.f25;const pct=cum/tot25*100;
+    abcMap[c.n]=pct<=80?'A':pct<=95?'B':'C';
+  });
+  const abcCount={A:0,B:0,C:0},abcFat={A:0,B:0,C:0};
+  Object.entries(abcMap).forEach(([n,g])=>{abcCount[g]++;abcFat[g]+=(FAT_REAL[n]||{})['2025']||0;});
+  document.getElementById('ins-abc-cards').innerHTML=['A','B','C'].map(g=>{
+    const col=g==='A'?'var(--green)':g==='B'?'var(--amber)':'var(--text3)';
+    return '<div style="flex:1;background:'+(g==='A'?'rgba(10,122,82,.08)':g==='B'?'rgba(154,90,8,.08)':'rgba(0,0,0,.04)')+';border-radius:7px;padding:8px 10px;border-left:3px solid '+col+'"><div style="font-size:18px;font-weight:700;color:'+col+'">'+abcCount[g]+'</div><div style="font-size:9px;font-weight:700;color:'+col+'">CLASSE '+g+'</div><div style="font-size:10px;color:var(--text2)">R$'+Math.round(abcFat[g]/1000)+'k &middot; '+(abcFat[g]/tot25*100).toFixed(0)+'%</div></div>';
+  }).join('');
+  document.getElementById('ins-abc-list').innerHTML=
+    ['A','B','C'].map(g=>{
+      const cs=Object.entries(abcMap).filter(([,gg])=>gg===g).map(([n])=>n);
+      const col=g==='A'?'var(--green)':g==='B'?'var(--amber)':'var(--text3)';
+      return '<div style="margin-bottom:6px"><span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:3px;color:'+col+';background:'+(g==='A'?'rgba(10,122,82,.1)':g==='B'?'rgba(154,90,8,.1)':'rgba(0,0,0,.06)')+'">'+g+'</span> '+cs.join(', ')+'</div>';
+    }).join('');
+
+  // ── CRESCIMENTO vs QUEDA ──────────────────────────────
+  const hasT=clis.filter(c=>c.pct25!==null&&c.f23>10000).sort((a,b)=>b.pct25-a.pct25);
+  const top8=hasT.slice(0,5);const bot8=hasT.slice(-5).reverse();
+  const tData=[...top8,...bot8];
+  mkI('ins-trend-chart','bar',{
+    labels:tData.map(c=>c.n.length>14?c.n.slice(0,14)+'...':c.n),
+    datasets:[{label:'Variacao % 2023->2025',data:tData.map(c=>c.pct25),
+      backgroundColor:tData.map(c=>c.pct25>=0?'rgba(10,122,82,.7)':'rgba(194,43,42,.7)'),
+      borderRadius:4}]
+  },{pl:{legend:{display:false},tooltip:{callbacks:{label:ctx=>(ctx.raw>=0?'+':'')+ctx.raw.toFixed(0)+'% (2023->2025)'}}},
+     sc:{x:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>v+'%'}}}});
+
+  // ── CONCENTRACAO ──────────────────────────────────────
+  const top6=sorted25.filter(c=>c.f25>0).slice(0,6);
+  const outros=tot25-top6.reduce((s,c)=>s+c.f25,0);
+  mkI('ins-conc-chart','doughnut',{
+    labels:[...top6.map(c=>c.n),'Outros'],
+    datasets:[{data:[...top6.map(c=>c.f25),outros],
+      backgroundColor:['#1A5FA8','#0A7A52','#C22B2A','#5A52C0','#9A5A08','#6A3A90','#aaa'],
+      borderWidth:2,borderColor:'#F8F7F4'}]
+  },{pl:{legend:{position:'right',labels:{font:{size:10},padding:8,color:'#4A4756',boxWidth:10}},
+      tooltip:{callbacks:{label:ctx=>ctx.label+': R$'+Math.round(ctx.raw/1000)+'k ('+((ctx.raw/tot25)*100).toFixed(1)+'%)'}}}});
+
+    // ── FAT/KG POR PROCESSO (maior volume) ──────────────────
+  const lavFkg=Object.entries(LAV_DATA).filter(([,d])=>d.v>15000)
+    .sort((a,b)=>b[1].v-a[1].v).slice(0,12);
+  mkI('ins-margin-chart','bar',{
+    labels:lavFkg.map(([n])=>n.length>18?n.slice(0,18)+'...':n),
+    datasets:[{label:'Fat. real R$/kg',data:lavFkg.map(([,d])=>d.fkg),
+      backgroundColor:lavFkg.map(([,d])=>d.fkg>15?'rgba(90,82,192,.7)':d.fkg>8?'rgba(26,95,168,.7)':'rgba(10,122,82,.7)'),
+      borderRadius:3}]
+  },{pl:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$'+ctx.raw.toFixed(2)+'/kg faturado'}}},
+     sc:{x:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:9}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+v}}}});
+
+  // ── EVOLUCAO─────────────────────────────────
+  
+
+  // ── EVOLUCAO TOP 6 CLIENTES ───────────────────────────
+  const top6c=sorted25.filter(c=>c.f25>0).slice(0,6);
+  const eCors=['#1A5FA8','#0A7A52','#C22B2A','#5A52C0','#9A5A08','#6A3A90'];
+  mkI('ins-evol-chart','line',{
+    labels:['2023','2024','2025','2026 YTD'],
+    datasets:top6c.map((c,i)=>({label:c.n,
+      data:[c.f23,c.f24,c.f25,c.f26].map(v=>v||null),
+      borderColor:eCors[i],backgroundColor:'transparent',borderWidth:2,
+      pointRadius:4,pointBackgroundColor:eCors[i],
+      borderDash:c.f26>0&&i<2?[]:[],tension:0.3}))
+  },{pl:{legend:{position:'top',labels:{font:{size:10},boxWidth:9,padding:8}}},
+     sc:{x:{grid:{color:'rgba(0,0,0,.06)'}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+Math.round(v/1000)+'k'}}}});
+
+  // ── CATEGORIAS LAV ────────────────────────────────────
+  const catTot={};
+  Object.values(LAV_DATA).forEach(d=>{
+    const cat=(d.cat||'Outros').split(' · ')[0];
+    catTot[cat]=(catTot[cat]||0)+d.v;
+  });
+  const catSorted=Object.entries(catTot).sort((a,b)=>b[1]-a[1]);
+  mkI('ins-cat-chart','doughnut',{
+    labels:catSorted.map(([c])=>c),
+    datasets:[{data:catSorted.map(([,v])=>v),
+      backgroundColor:['#1A5FA8','#0A7A52','#C22B2A','#5A52C0','#9A5A08','#6A3A90'],
+      borderWidth:2,borderColor:'#F8F7F4'}]
+  },{pl:{legend:{position:'right',labels:{font:{size:10},padding:8,color:'#4A4756',boxWidth:10}},
+      tooltip:{callbacks:{label:ctx=>ctx.label+': R$'+Math.round(ctx.raw/1000)+'k'}}}});
+
+  // ── WATCHLIST ─────────────────────────────────────────
+  const wl=[];
+  // Clientes em queda forte
+  clis.filter(c=>c.f23>30000&&c.pct25<-30).forEach(c=>
+    wl.push({tipo:'Cliente em risco',icon:'🔴',nome:c.n,detalhe:'Queda de '+Math.abs(c.pct25.toFixed(0))+'% no faturamento (2023→2025)',acao:'Verificar relacionamento e renovacao de pedidos',onclick:"sel('"+c.n+"');switchTab('busca',document.querySelector('.tab-btn'));"}));
+  // Processos concentrados em 1 cliente
+  Object.entries(LAV_DATA).filter(([,d])=>{const t=Object.entries(d.c||{}).sort((a,b)=>b[1]-a[1]);return t[0]&&d.v>20000&&t[0][1]/d.v>0.85;}).forEach(([n,d])=>{
+    const top=Object.entries(d.c).sort((a,b)=>b[1]-a[1])[0];
+    wl.push({tipo:'Concentracao processo',icon:'🟡',nome:n,detalhe:top[0]+' representa '+(top[1]/d.v*100).toFixed(0)+'% deste processo',acao:'Prospectar outros clientes para diversificar',onclick:"switchTab('lavagens',document.querySelectorAll('.tab-btn')[2]);"});
+  });
+
+  // Clientes crescendo muito
+  clis.filter(c=>c.pct25>40&&c.f25>30000).forEach(c=>
+    wl.push({tipo:'Oportunidade',icon:'🟢',nome:c.n,detalhe:'Cresceu '+c.pct25.toFixed(0)+'% (2023→2025) — potencial de expansao',acao:'Avaliar capacidade para absorver mais volume deste cliente',onclick:"sel('"+c.n+"');switchTab('busca',document.querySelector('.tab-btn'));"}));
+
+  document.getElementById('ins-watchlist').innerHTML=
+    '<table style="width:100%;border-collapse:collapse;font-size:11px">'
+    +'<thead><tr style="background:var(--bg3)"><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid var(--border2)">Tipo</th><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid var(--border2)">Item</th><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid var(--border2)">Detalhe</th><th style="padding:7px 10px;text-align:left;border-bottom:1.5px solid var(--border2)">Acao sugerida</th><th style="padding:7px 10px;border-bottom:1.5px solid var(--border2)"></th></tr></thead>'
+    +'<tbody>'
+    +wl.map((w,i)=>'<tr style="'+(i%2?'background:rgba(0,0,0,.015)':'')+'">'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border)"><span style="font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;background:'+(w.icon==='🔴'?'rgba(194,43,42,.1)':w.icon==='🟢'?'rgba(10,122,82,.1)':'rgba(154,90,8,.1)')+';color:'+(w.icon==='🔴'?'var(--red)':w.icon==='🟢'?'var(--green)':'var(--amber)')+'">'+w.tipo+'</span></td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border);font-weight:600">'+w.icon+' '+w.nome+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text2)">'+w.detalhe+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border);color:var(--text3)">'+w.acao+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border)"><button onclick="'+w.onclick+'" style="padding:3px 9px;font-size:10px;border:1px solid var(--blue);border-radius:4px;color:var(--blue);background:none;cursor:pointer">Ver →</button></td>'
+      +'</tr>').join('')
+    +'</tbody></table>';
+}
+
+
+// ===== CUSTOS & MARGEM REAL =====
+const CUSTO_MAP={"SOFT":{"anos":{"2023":0.02,"2024":0.08,"2025":0.06,"2026":0.06},"ref":"SOFT","nota":""},"SOFT FREE":{"anos":{"2023":0.02,"2024":0.08,"2025":0.06,"2026":0.06},"ref":"SOFT","nota":""},"SOFT C/ SABÃO":{"anos":{"2023":0.02,"2024":0.08,"2025":0.06,"2026":0.06},"ref":"SOFT","nota":""},"ONE FIX":{"anos":{"2023":0.54,"2024":1.09,"2025":0.4,"2026":0.55},"ref":"ONE FIX","nota":""},"ONE WASHED":{"anos":{"2023":0.68,"2024":1.3,"2025":0.56,"2026":0.63},"ref":"ONE WASHED","nota":""},"ONE RESINADO":{"anos":{"2023":0.75,"2024":1.55,"2025":0.81,"2026":1.47},"ref":"ONE RESINADO","nota":""},"SUPER STONE (JEANS)":{"anos":{"2023":0.61,"2024":0.78,"2025":0.74,"2026":0.75},"ref":"SUPER STONE (JEANS)","nota":""},"SUPER STONE (PT)":{"anos":{"2023":0.36,"2024":0.51,"2025":0.46,"2026":0.56},"ref":"SUPER STONE (PT)","nota":""},"TINGIMENTO REATIVO":{"anos":{"2023":3.2,"2024":3.49,"2025":3.49,"2026":2.55},"ref":"TINGIMENTO REATIVO MÉDIO (3%)","nota":"CUSTO FINAL base MÉDIO 3%"},"TINGIMENTO CATIONIZADO":{"anos":{"2023":3.61,"2024":3.92,"2025":3.99,"2026":3.91},"ref":"TINGIMENTO CATIONIZADO CLARO (1%)","nota":"CUSTO FINAL (insumos+água), base CATIONIZADO CLARO 1%, 571min/338L"},"TINGIMENTO DIRETO":{"anos":{"2023":2.24,"2024":3.65,"2025":3.97,"2026":3.01},"ref":"TINGIMENTO DIRETO PRETO (3.5%)","nota":"CUSTO FINAL insumos, base 3.5%"},"ALVEJAMENTO (PT)":{"anos":{"2024":1.78,"2025":1.78,"2026":1.71},"ref":"ALVEJAMENTO (PT)","nota":"Custo insumos"}};
+const CUSTO_MIN={"2024": 0.0177, "2025": 0.0211, "2026": 0.0225};
+let cmChart=null, cmEvolChart=null, cmMgChart=null;
+
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pane-'+id).classList.add('on');
+  btn.classList.add('on');
+  if(id==='todos') renderTodos();
+  if(id==='lavagens') renderLav();
+  if(id==='insights') renderInsights();
+  if(id==='margem') renderMargem();
+  if(id==='custos') renderCustos();
+}
+
+function renderCustos(){
+  const yr=document.getElementById('cm-year').value;
+  const cf=document.getElementById('cm-cat').value;
+  document.getElementById('cm-chart-year').textContent=yr;
+  document.getElementById('cm-year2').textContent=yr;
+
+  // Build rows: merge CUSTO_MAP + LAV_DATA
+  let rows=[];
+  Object.entries(LAV_DATA).forEach(([lav_n,lav_d])=>{
+    const cm=CUSTO_MAP[lav_n];
+    const custo=cm?cm.anos[yr]:null;
+    const pv=lav_d.fkg;
+    const cat=lav_d.cat||'';
+    if(cf&&!cat.includes(cf)) return;
+    const fat_yr=lav_d.a?lav_d.a[yr]||0:0;
+    rows.push({n:lav_n,pv,custo,cat,fat:fat_yr,ref:cm?cm.ref:'',nota:cm?cm.nota:''});
+  });
+  rows.sort((a,b)=>b.fat-a.fat);
+
+  const withCusto=rows.filter(r=>r.custo!=null);
+  document.getElementById('cm-count').textContent=withCusto.length+' processos com custo mapeado de '+rows.length+' totais';
+
+  // KPIs
+  const avgPv=withCusto.length?withCusto.reduce((s,r)=>s+r.pv,0)/withCusto.length:0;
+  const avgC=withCusto.length?withCusto.reduce((s,r)=>s+r.custo,0)/withCusto.length:0;
+  const avgMg=withCusto.length?withCusto.reduce((s,r)=>s+(r.pv-r.custo),0)/withCusto.length:0;
+  const totFat=withCusto.reduce((s,r)=>s+r.fat,0);
+  const kpiEl=document.getElementById('cm-kpis');
+  if(kpiEl) kpiEl.innerHTML=[
+    ['PV M&#xE9;dio Real','R$'+avgPv.toFixed(2)+'/kg','k23'],
+    ['Custo M&#xE9;dio Insumos','R$'+avgC.toFixed(2)+'/kg','k22'],
+    ['Margem M&#xE9;dia Bruta','R$'+avgMg.toFixed(2)+'/kg','k24'],
+    ['Fat. Processos Mapeados','R$'+Math.round(totFat/1000)+'k','k25']
+  ].map(([l,v,c])=>'<div class="kpi '+c+'"><div class="kl">'+l+'</div><div class="kv" style="font-size:16px">'+v+'</div></div>').join('');
+
+  // Chart PV vs Custo
+  const top12=withCusto.filter(r=>r.fat>0).sort((a,b)=>b.fat-a.fat).slice(0,12);
+  const cEl=document.getElementById('cm-chart');
+  if(cEl){
+    if(cmChart)cmChart.destroy();
+    cmChart=new Chart(cEl,{type:'bar',data:{
+      labels:top12.map(r=>r.n.length>16?r.n.slice(0,16)+'...':r.n),
+      datasets:[
+        {label:'PV Real (R$/kg)',data:top12.map(r=>r.pv),backgroundColor:'rgba(26,95,168,.7)',borderRadius:3},
+        {label:'Custo Insumos (R$/kg)',data:top12.map(r=>r.custo),backgroundColor:'rgba(154,90,8,.6)',borderRadius:3}
+      ]
+    },options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:8}},
+               tooltip:{backgroundColor:'rgba(248,247,244,.97)',titleColor:'#1A1820',bodyColor:'#4A4756',borderColor:'rgba(0,0,0,.12)',borderWidth:1,
+                 callbacks:{label:ctx=>'R$'+ctx.raw.toFixed(2)+'/kg'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:9}}},
+               y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+v}}}
+    }});
+  }
+
+  // Evolucao historica
+  const evolRows=Object.entries(CUSTO_MAP).filter(([n])=>LAV_DATA[n]).map(([n,d])=>{
+    const anos=['2023','2024','2025','2026'];
+    if(anos.every(y=>d.anos[y]!=null)&&LAV_DATA[n])return{n,d};
+    return null;
+  }).filter(Boolean).slice(0,6);
+  const evolEl=document.getElementById('cm-evol-chart');
+  const yc=['#8A6018','#1A5FA8','#0A7A52','#5A52C0'];
+  if(evolEl&&evolRows.length){
+    if(cmEvolChart)cmEvolChart.destroy();
+    cmEvolChart=new Chart(evolEl,{type:'line',data:{
+      labels:['2023','2024','2025','2026'],
+      datasets:evolRows.map(({n,d},i)=>{
+        const nm=n.length>18?n.slice(0,18)+'...':n;
+        return {label:nm,data:['2023','2024','2025','2026'].map(y=>d.anos[y]||null),
+          borderColor:yc[i%4],backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:0.3};
+      })
+    },options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{font:{size:9},boxWidth:8,padding:6}},
+               tooltip:{callbacks:{label:ctx=>'R$'+ctx.raw.toFixed(2)+'/kg'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.06)'}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+v}}}
+    }});
+  }
+
+  // Margem chart
+  const mgRows=[...withCusto].filter(r=>r.fat>0).sort((a,b)=>(b.pv-b.custo)-(a.pv-a.custo)).slice(0,12);
+  const mgEl=document.getElementById('cm-mg-chart');
+  if(mgEl){
+    if(cmMgChart)cmMgChart.destroy();
+    cmMgChart=new Chart(mgEl,{type:'bar',data:{
+      labels:mgRows.map(r=>r.n.length>14?r.n.slice(0,14)+'...':r.n),
+      datasets:[{label:'Margem bruta R$/kg',data:mgRows.map(r=>+(r.pv-r.custo).toFixed(2)),
+        backgroundColor:mgRows.map(r=>(r.pv-r.custo)>=0?'rgba(10,122,82,.7)':'rgba(194,43,42,.7)'),
+        borderRadius:3}]
+    },options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>'R$'+ctx.raw.toFixed(2)+'/kg'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:9}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+v}}}
+    }});
+  }
+
+  // Tabela
+  const tbody=document.getElementById('cm-body');
+  if(tbody)tbody.innerHTML=rows.map((r,i)=>{
+    const mg=r.custo!=null?+(r.pv-r.custo).toFixed(2):null;
+    const mgPct=mg!=null&&r.pv>0?((mg/r.pv)*100).toFixed(1)+'%':null;
+    const mgCl=mg===null?'color:var(--text3)':mg>=0?'color:var(--green);font-weight:700':'color:var(--red);font-weight:700';
+    const catSplit=(r.cat||'').split(' · ');
+    const catLabel=catSplit[1]||r.cat||'';
+    const catC=CAT_COLOR[r.cat]||'#888';
+    const rb=i%2?'background:rgba(0,0,0,.015)':'';
+    return '<tr style="'+rb+'">'
+      +'<td style="padding:6px 12px;border-bottom:1px solid var(--border);font-weight:600">'+r.n+'</td>'
+      +'<td style="padding:5px 8px;border-bottom:1px solid var(--border)"><span style="font-size:9px;padding:2px 6px;border-radius:3px;background:'+catC+'22;color:'+catC+';font-weight:600">'+catLabel+'</span></td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-weight:600;color:var(--purple)">R$'+r.pv.toFixed(2)+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);color:var(--amber)">'+(r.custo!=null?'R$'+r.custo.toFixed(2):'<span style=\'color:var(--text3)\'>n/d</span>')+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);'+mgCl+'">'+(mg!=null?(mg>=0?'+':'')+mg.toFixed(2)+'/kg':'&mdash;')+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">'+(mgPct||'&mdash;')+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border)">'+(r.fat>0?'R$'+Math.round(r.fat/1000)+'k':'&mdash;')+'</td>'
+      +'<td style="padding:5px 12px;border-bottom:1px solid var(--border);font-size:10px;color:var(--text3)">'+(r.ref||'&mdash;')+(r.nota?'<br>'+r.nota:'')+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+
+// ===== MARGEM REAL =====
+const CUSTO_PROD={"TINGIMENTO REATIVO":{"label":"Tingimento Reativo (Dystar/Coratex)","cat":"Tinturaria","c25":{"claro":2.05,"medio":5.13,"escuro":6.08,"intenso":8.17},"c26":{"claro":2.35,"medio":4.74,"escuro":7.59,"intenso":11.4},"ref":"Historico REATIVO DYSTAR — Processos de Lavagem 2025 (10/31/2025) e 2026 (06/25/2026)"},"TINGIMENTO REATIVO (TENCEL)":{"label":"Reativo (Tencel)","cat":"Tinturaria","c25":{"claro":3.43,"medio":5.22,"escuro":6.92,"intenso":9.01},"c26":{"claro":3.04,"medio":5.43,"escuro":8.29,"intenso":12.09},"ref":"Historico REATIVO TENCEL — Processos de Lavagem 2025 e 2026"},"TINGIMENTO CATIONIZADO":{"label":"Tingimento Cationizado","cat":"Tinturaria","c25":{"claro":4.44,"medio":6.23,"escuro":7.93,"intenso":10.02},"c26":{"claro":3.16,"medio":5.56,"escuro":8.41,"intenso":12.21},"ref":"Historico CATIONIZADO ESTONADO — Processos de Lavagem 2025 e 2026"},"TINGIMENTO REATIVO ESPECIAL (BRILHANTE)":{"label":"Reativo Especial (Brilhante)","cat":"Tinturaria","c25":{"claro":2.65,"medio":3.8,"escuro":6.24},"c26":{"claro":2.97,"medio":5.1,"escuro":8.33},"ref":"Historico REATIVO BRILHANTE ALSTAR — Processos de Lavagem 2025 e 2026"},"TINGIMENTO REATIVO ESTONADO":{"label":"Reativo Estonado","cat":"Tinturaria","c25":{"claro":3.87,"medio":5.66,"escuro":7.36,"intenso":9.45},"c26":{"claro":3.0,"medio":5.4,"escuro":8.25,"intenso":12.0},"ref":"Historico REATIVO ESTONADO — Processos de Lavagem 2025 e 2026"},"TINGIMENTO ESTONADO CATIONIZADO":{"label":"Cationizado Estonado (Hiperdestroyer)","cat":"Tinturaria","c25":{"claro":5.78,"medio":7.57,"escuro":9.27,"intenso":11.36},"c26":{"claro":5.71,"medio":7.52,"escuro":9.25,"intenso":11.36},"ref":"Historico ESTONADO CATIONIZADO HIPERDESTROYER — Processos de Lavagem 2025 e 2026"},"TINGIMENTO DIRETO":{"label":"Tingimento Direto","cat":"Tinturaria","c25":{"p35":3.97,"p45":4.59,"p60":5.51},"c26":{"p35":3.01,"p60":3.71},"ref":"Historico DIRETO PRETO — Processos de Lavagem 2025 e 2026"},"ALVEJAMENTO (PT)":{"label":"Alvejamento (PT) Completo","cat":"Tinturaria","c25":1.78,"c26":1.71,"ref":"Historico ALVEJAMENTO PADRAO COMPLETO — Processos de Lavagem 2025 e 2026"},"ALVEJAMENTO ESPECIAL (PT)":{"label":"Alvejamento Especial (PT)","cat":"Tinturaria","c25":3.24,"c26":2.95,"ref":"Historico ALVEJAMENTO PADRAO ESPECIAL — Processos de Lavagem 2025 e 2026"},"ORGANIC COLOR (SUSTENTÁVEL)":{"label":"Organic Color","cat":"Tinturaria","c25":{"p01":2.67,"p03":3.06,"p06":3.64,"p10":4.41},"c26":{"p01":2.35,"p03":4.74,"p06":7.59,"p10":11.4},"ref":"Historico ORGANICO — Processos de Lavagem 2025 e 2026"},"SOFT":{"label":"Soft (Essência/Silicone)","cat":"Lavanderia","c25":0.08,"c26":0.06,"ref":"CUSTO KG insumos SOFT|A|ESSENCIA — Processos de Lavagem 2025 e 2026"},"SOFT C/ SABÃO":{"label":"Soft c/ Sabão","cat":"Lavanderia","c25":0.2,"c26":0.28,"ref":"CUSTO KG insumos SOFT|A|SABAO — Processos de Lavagem 2025 e 2026"},"STONE MÉDIO":{"label":"Stone Médio","cat":"Lavanderia","c25":0.71,"c26":0.99,"ref":"CUSTO KG insumos STONE MÉDIO — Processos de Lavagem 2025 e 2026"},"ONE WASHED":{"label":"One Washed","cat":"Lavanderia","c25":0.56,"c26":0.78,"ref":"CUSTO KG insumos ONE WASHED — Processos de Lavagem 2025 e 2026"},"ONE FIX":{"label":"One Fix","cat":"Lavanderia","c25":0.4,"c26":0.63,"ref":"CUSTO KG insumos ONE FIX — Processos de Lavagem 2025 e 2026"},"DESTROYER MÉDIO (CLORO/ ENZIMA)":{"label":"Destroyer Médio (Cloro/Enzima)","cat":"Lavanderia","c25":1.89,"c26":2.26,"ref":"CUSTO KG insumos DESTROYER MÉDIO — Processos de Lavagem 2025 e 2026"},"DELAVE (CLORO)":{"label":"Delavê (Cloro)","cat":"Lavanderia","c25":1.72,"c26":2.03,"ref":"CUSTO KG insumos DELAVE (CLORO) — Processos de Lavagem 2025 e 2026"},"SUPER STONE (JEANS)":{"label":"Super Stone (Jeans)","cat":"Lavanderia","c25":0.74,"c26":0.75,"ref":"CUSTO KG insumos SUPER STONE (JEANS) — Processos de Lavagem 2025 e 2026"},"ONE RESINADO":{"label":"One Resinado","cat":"Lavanderia","c25":0.81,"c26":1.56,"ref":"CUSTO KG insumos ONE RESINADO — Processos de Lavagem 2025 e 2026"}};
+
+function getCustoAvg(cp, key) {
+  const v = cp[key];
+  if (!v) return null;
+  if (typeof v === 'number') return v;
+  const vals = Object.values(v).filter(x=>x!==null);
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+}
+
+function getCustoRange(cp, key) {
+  const v = cp[key];
+  if (!v) return null;
+  if (typeof v === 'number') return [v, v];
+  const vals = Object.values(v).filter(x=>x!==null).sort((a,b)=>a-b);
+  return vals.length ? [vals[0], vals[vals.length-1]] : null;
+}
+
+let mgSort = 'mg26';
+
+function renderMargem() {
+  const rows = Object.entries(CUSTO_PROD).map(([nome, cp]) => {
+    const lav = LAV_DATA[nome] || {};
+    const fkg = lav.fkg || 0;
+    const fat = lav.v || 0;
+    const c25 = getCustoAvg(cp,'c25');
+    const c26 = getCustoAvg(cp,'c26');
+    const r25 = getCustoRange(cp,'c25');
+    const r26 = getCustoRange(cp,'c26');
+    const mg25 = (fkg && c25 !== null) ? (fkg-c25)/fkg*100 : null;
+    const mg26 = (fkg && c26 !== null) ? (fkg-c26)/fkg*100 : null;
+    const varC = (c25 && c26) ? (c26-c25)/c25*100 : null;
+    return {nome, label:cp.label||nome, cat:cp.cat||'', fkg, fat, c25, c26, r25, r26, mg25, mg26, varC, ref:cp.ref||''};
+  }).filter(r=>r.fkg>0 && (r.c25!==null||r.c26!==null));
+
+  // Sort
+  rows.sort((a,b) => mgSort==='mg26'?(b.mg26||0)-(a.mg26||0):mgSort==='mg25'?(b.mg25||0)-(a.mg25||0):mgSort==='fkg'?b.fkg-a.fkg:b.fat-a.fat);
+
+  // KPIs
+  const avgMg26 = rows.filter(r=>r.mg26!==null).reduce((s,r)=>s+r.mg26,0)/rows.filter(r=>r.mg26!==null).length;
+  const highMg = rows.filter(r=>r.mg26!==null).reduce((a,r)=>r.mg26>a.mg26?r:a, rows[0]);
+  const lowMg = rows.filter(r=>r.mg26!==null).reduce((a,r)=>r.mg26<a.mg26?r:a, rows[0]);
+  const rising = rows.filter(r=>r.varC!==null&&r.varC>0).length;
+  document.getElementById('mg-kpis').innerHTML=[
+    ['Margem M&#xE9;dia 2026',avgMg26.toFixed(1)+'%','k25'],
+    ['Maior Margem 2026',(highMg?highMg.label+' '+highMg.mg26.toFixed(0)+'%':'—'),'k24'],
+    ['Menor Margem 2026',(lowMg?lowMg.label+' '+lowMg.mg26.toFixed(0)+'%':'—'),'k26'],
+    ['Custo em alta 2025&#x2192;2026',rising+' processos','k22']
+  ].map(([l,v,c])=>'<div class="kpi '+c+'"><div class="kl">'+l+'</div><div class="kv" style="font-size:15px">'+v+'</div></div>').join('');
+
+  // Sort bar
+  const sortOpts=[['mg26','Margem 2026'],['mg25','Margem 2025'],['fkg','PV/kg'],['fat','Faturamento']];
+  document.getElementById('mg-sort-bar').innerHTML=sortOpts.map(([k,l])=>
+    '<button onclick="mgSort=\''+k+'\';renderMargem()" style="padding:2px 8px;font-size:10px;border-radius:3px;cursor:pointer;border:1px solid var(--border2);background:'+(mgSort===k?'var(--blue)':'var(--bg3)')+';color:'+(mgSort===k?'#fff':'var(--text2)')+'">'+l+'</button>'
+  ).join('');
+
+  // Table
+  document.getElementById('mg-body').innerHTML=rows.map((r,i)=>{
+    const is_tint = r.cat==='Tinturaria';
+    const mg26ok = r.mg26!==null;
+    const mg25ok = r.mg25!==null;
+    const mg26col = mg26ok?(r.mg26>70?'color:var(--green);font-weight:700':r.mg26>40?'color:var(--blue)':'color:var(--amber)'):'color:var(--text3)';
+    const mg25col = mg25ok?(r.mg25>70?'color:var(--green);font-weight:700':r.mg25>40?'color:var(--blue)':'color:var(--amber)'):'color:var(--text3)';
+    const varColor = r.varC===null?'':r.varC>10?'color:var(--red)':r.varC<-10?'color:var(--green)':'color:var(--text3)';
+    const rb = i%2?'background:rgba(0,0,0,.015)':'';
+    const c25disp = r.r25?'R$'+r.r25[0].toFixed(2)+(r.r25[0]!==r.r25[1]?' — R$'+r.r25[1].toFixed(2):''):'—';
+    const c26disp = r.r26?'R$'+r.r26[0].toFixed(2)+(r.r26[0]!==r.r26[1]?' — R$'+r.r26[1].toFixed(2):''):'—';
+    return '<tr style="'+rb+'">'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-weight:600">'+r.label+'</td>'
+      +'<td style="padding:5px 6px;text-align:center;border-bottom:1px solid var(--border)"><span style="font-size:9px;padding:1px 5px;border-radius:3px;background:'+(is_tint?'rgba(26,95,168,.1)':'rgba(10,122,82,.1)')+';color:'+(is_tint?'var(--blue)':'var(--green)')+';font-weight:700">'+(is_tint?'TINT':'LAV')+'</span></td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-weight:600;color:var(--purple)">R$'+r.fkg.toFixed(2)+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:10px">'+c25disp+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);'+mg25col+'">'+(mg25ok?r.mg25.toFixed(1)+'%':'—')+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:10px">'+c26disp+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);'+mg26col+'">'+(mg26ok?r.mg26.toFixed(1)+'%':'—')+'</td>'
+      +'<td style="padding:5px 8px;text-align:right;border-bottom:1px solid var(--border);font-size:10px;'+varColor+'">'+(r.varC!==null?(r.varC>=0?'+':'')+r.varC.toFixed(1)+'%':'—')+'</td>'
+      +'<td style="padding:5px 10px;border-bottom:1px solid var(--border);font-size:9px;color:var(--text3)">'+
+        (is_tint?'Custo total (insumos+&#xE1;gua+tempo)':'Custo insumos')
+        +(r.r25&&r.r25[0]!==r.r25[1]?' | intervalo por intensidade':'')
+      +'</td>'
+      +'</tr>';
+  }).join('');
+
+  // Charts
+  const tint = rows.filter(r=>r.cat==='Tinturaria');
+  const lav = rows.filter(r=>r.cat==='Lavanderia');
+
+  const mkMg = (id, data) => {
+    const el=document.getElementById(id); if(!el) return;
+    if(mgCharts&&mgCharts[id]) mgCharts[id].destroy();
+    mgCharts[id]=new Chart(el,{type:'bar',data:{
+      labels:data.map(r=>r.label.length>20?r.label.slice(0,20)+'...':r.label),
+      datasets:[
+        {label:'PV Real R$/kg',data:data.map(r=>r.fkg),backgroundColor:'rgba(90,82,192,.7)',borderRadius:3},
+        {label:'Custo 2025 R$/kg (avg)',data:data.map(r=>r.c25||0),backgroundColor:'rgba(26,95,168,.5)',borderRadius:3},
+        {label:'Custo 2026 R$/kg (avg)',data:data.map(r=>r.c26||0),backgroundColor:'rgba(194,43,42,.5)',borderRadius:3}
+      ]
+    },options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:ctx=>'R$'+ctx.raw.toFixed(2)+'/kg'}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:9}}},
+        y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{callback:v=>'R$'+v}}}
+    }});
+  };
+  mkMg('mg-tint-chart',tint);
+  mkMg('mg-lav-chart',lav);
+}
+const mgCharts={};
+
+</script>
+
+<!-- MODAL LEGENDA -->
+<div class="leg-modal" id="leg-modal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="leg-box">
+    <div class="leg-hdr">
+      <div style="font-size:14px;font-weight:700;color:#fff">&#x2139;&#xFE0F; Legenda do Painel de Clientes</div>
+      <button onclick="document.getElementById('leg-modal').style.display='none'" style="font-size:18px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,.8)">&#x2715;</button>
+    </div>
+    <div class="leg-body">
+
+      <!-- ANOS -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F4C5; Cores por Ano</div>
+        <div class="leg-row"><span class="leg-dot" style="background:#8A6018"></span><b style="color:#8A6018">2022</b> &mdash; ano base hist&oacute;rico</div>
+        <div class="leg-row"><span class="leg-dot" style="background:#1A5FA8"></span><b style="color:#1A5FA8">2023</b> &mdash; dados reais BD PCP</div>
+        <div class="leg-row"><span class="leg-dot" style="background:#0A7A52"></span><b style="color:#0A7A52">2024</b> &mdash; dados reais BD PCP</div>
+        <div class="leg-row"><span class="leg-dot" style="background:#5A52C0"></span><b style="color:#5A52C0">2025</b> &mdash; dados reais BD PCP</div>
+        <div class="leg-row"><span class="leg-dot" style="background:#C22B2A"></span><b style="color:#C22B2A">2026</b> &mdash; YTD JAN-JUN (parcial)</div>
+      </div>
+
+      <!-- FONTES -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F4BE; Fontes de Dados</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(10,122,82,.1);color:#0A7A52">&#x2705; BD Real</span>OS, Pe&ccedil;as e KG extra&iacute;dos do BD_2022_2025.xlsx (PCP)</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(154,90,8,.1);color:#9A5A08">&#x1F4CB; MAPA/Exp.</span>Distribui&ccedil;&atilde;o por cliente via MAPA/Expedi&ccedil;&atilde;o 2026</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(90,82,192,.1);color:#5A52C0">R$ Fat. Real</span>Valor Faturado real (BASE.23.25 + BASE.26)</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(90,82,192,.1);color:#5A52C0">R$/kg fat.</span>Faturamento real (Valor Faturado BASE) dividido pelo KG processado &mdash; PV m&eacute;dio real</div>
+        <div class="leg-row" style="margin-top:6px;font-size:10px;color:var(--text3)">&#x26A0;&#xFE0F; TOP 5 Clientes da planilha exibe ABR &mdash; totais mensais JAN-JUL · JUL em andamento (08/07 10:10)s</div>
+      </div>
+
+      <!-- TENDENCIAS -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F4C8; Tend&ecirc;ncia e Varia&ccedil;&atilde;o</div>
+        <div class="leg-row"><span style="color:#0A7A52;font-weight:700;font-size:13px">&#x25B2;</span><b style="color:#0A7A52">Crescimento</b> &mdash; varia&ccedil;&atilde;o positiva vs ano anterior</div>
+        <div class="leg-row"><span style="color:#C22B2A;font-weight:700;font-size:13px">&#x25BC;</span><b style="color:#C22B2A">Queda</b> &mdash; varia&ccedil;&atilde;o negativa vs ano anterior</div>
+        <div class="leg-row"><span style="color:#8A8798;font-weight:700;font-size:13px">&#x2192;</span><b style="color:#8A8798">Est&aacute;vel</b> &mdash; varia&ccedil;&atilde;o inferior a &#xB1;5%</div>
+        <div class="leg-row" style="margin-top:4px"><span class="leg-line" style="background:#8A6018"></span>Linha 2022 no gr&aacute;fico mensal</div>
+        <div class="leg-row"><span class="leg-line" style="background:#C22B2A;border-top:2px dashed #C22B2A;height:0"></span>Linha 2026 (tracejado = estimativa)</div>
+      </div>
+
+      <!-- INSIGHTS LAVAGENS -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F9EA; Insights &mdash; Aba Lavagens</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(26,95,168,.1);color:#1A5FA8">DOMINANTE</span>&gt;30% do faturamento total da Delta</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(90,82,192,.1);color:#5A52C0">ALTO VALOR</span>Fat/kg acima de R$20 &mdash; processo de alto valor agregado</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(154,90,8,.1);color:#9A5A08">BAIXO VALOR/KG</span>Fat/kg abaixo de R$3 com volume relevante &mdash; verificar</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(194,43,42,.1);color:#C22B2A">CLIENTE UNICO</span>1 cliente responde por &gt;90% do processo</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(154,90,8,.1);color:#9A5A08">CONCENTRADO</span>1 cliente com 60&ndash;90% do faturamento</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(194,43,42,.1);color:#C22B2A">QUEDA FORTE</span>Faturamento caiu &gt;40% em 2025 vs 2024</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(10,122,82,.1);color:#0A7A52">CRESCIMENTO</span>Faturamento cresceu &gt;40% em 2025 vs 2024</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(90,82,192,.1);color:#5A52C0">PREMIUM</span>Fat/kg acima de R$20 &mdash; alto valor agregado</div>
+        <div class="leg-row"><span class="leg-bdg" style="background:rgba(0,0,0,.06);color:#8A8798">SEM TABELA</span>Processo sem custo mapeado no Custeio.Cliente.2026</div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F4CA; Indicadores por Cliente</div>
+        <div class="leg-row"><b>OS</b> &mdash; Ordens de Servi&ccedil;o processadas no per&iacute;odo</div>
+        <div class="leg-row"><b>Pe&ccedil;as</b> &mdash; Total de pe&ccedil;as processadas</div>
+        <div class="leg-row"><b>KG</b> &mdash; Volume em kg processado</div>
+        <div class="leg-row"><b>P&ccedil;s/OS</b> &mdash; Tamanho m&eacute;dio do lote por OS</div>
+        <div class="leg-row"><b>KG/P&ccedil;s</b> &mdash; Peso m&eacute;dio por pe&ccedil;a</div>
+        <div class="leg-row"><b>Fat. Real</b> &mdash; Valor Faturado real (n&atilde;o estimado)</div>
+        <div class="leg-row"><b>% Delta</b> &mdash; Participa&ccedil;&atilde;o do cliente no total da Delta no ano</div>
+        <div class="leg-row"><b>Var vs Ant.</b> &mdash; Varia&ccedil;&atilde;o percentual vs ano anterior</div>
+      </div>
+
+      <!-- CATEGORIAS LAVAGEM -->
+      <div class="leg-sec">
+        <div class="leg-sec-title">&#x1F9F5; Categorias de Lavagem</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#1A5FA8"></span><b>Tinturaria &middot; Reativo</b> &mdash; REATIVO, REATIVO (TENCEL), ESPECIAL</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#6A3A90"></span><b>Tinturaria &middot; Cationizado</b> &mdash; CATIONIZADO, ESTONADO CAT.</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#8A6018"></span><b>Tinturaria &middot; Direto</b> &mdash; DIRETO PRETO, DIRETO TENCEL</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#9A5A08"></span><b>Tinturaria &middot; Especiais</b> &mdash; ORGANIC COLOR, RETRODYE, PIGMENT</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#0A7A52"></span><b>Lavanderia &middot; Soft</b> &mdash; SOFT, SOFT C/ SAB&Atilde;O, SUPER SOFT</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#C22B2A"></span><b>Lavanderia &middot; Destroyer</b> &mdash; DESTROYER CLARO/M&Eacute;DIO/ESCURO</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#5A52C0"></span><b>Lavanderia &middot; One</b> &mdash; ONE FIX, ONE WASHED, ONE RESINADO</div>
+        <div class="leg-row"><span class="leg-sq" style="background:#3A7AB0"></span><b>Lavanderia &middot; Alvejamento</b> &mdash; ALVEJAMENTO (PT), ESPECIAL, BRANCO</div>
+      </div>
+
+    </div>
+    <div style="padding:12px 20px;background:var(--bg3);border-top:1px solid var(--border);font-size:10px;color:var(--text3);text-align:center">
+      Painel de Clientes Delta Tinturaria &amp; Lavanderia &middot; Dados: BD_2022_2025.xlsx + BASE.23.25 + BASE.26 + Atualizado 08/07/2026
+    </div>
+  </div>
+</div>
+
+
+<!-- ABA 4: INSIGHTS -->
+<div class="tab-pane" id="pane-insights">
+  <div style="padding:16px 20px 30px">
+
+    <!-- ALERTAS CRITICOS -->
+    <div id="ins-alertas" style="margin-bottom:16px"></div>
+
+    <!-- KPIs GERAIS -->
+    <div id="ins-kpis" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px"></div>
+
+    <!-- GRID PRINCIPAL -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- CURVA ABC -->
+      <div class="cc">
+        <div class="cc-title">&#x1F3AF; Classifica&#xE7;&#xE3;o ABC de Clientes (fat. 2025)</div>
+        <div class="cc-sub">Curva de Pareto &mdash; Classe A = 80% do faturamento &middot; B = 95% &middot; C = restante</div>
+        <div id="ins-abc-cards" style="display:flex;gap:8px;margin-bottom:10px"></div>
+        <div id="ins-abc-list" style="font-size:11px"></div>
+      </div>
+
+      <!-- CRESCIMENTO vs QUEDA -->
+      <div class="cc">
+        <div class="cc-title">&#x1F4C8; Carteira: Crescimento vs Queda (2023&#x2192;2025)</div>
+        <div class="cc-sub">Varia&#xE7;&#xE3;o do faturamento real entre o primeiro e &#xFA;ltimo ano dispon&#xED;vel nas bases</div>
+        <div style="position:relative;height:220px"><canvas id="ins-trend-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- CONCENTRACAO + PROCESSOS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- CONCENTRACAO RECEITA -->
+      <div class="cc">
+        <div class="cc-title">&#x26A0;&#xFE0F; Concentra&#xE7;&#xE3;o de Receita por Cliente (2025)</div>
+        <div class="cc-sub">Risco de depend&#xEA;ncia &mdash; quanto da receita est&#xE1; concentrada em poucos clientes</div>
+        <div style="position:relative;height:220px"><canvas id="ins-conc-chart"></canvas></div>
+      </div>
+
+      <!-- PROCESSOS MARGEM -->
+      <div class="cc">
+        <div class="cc-title">&#x1F4B0; Processos: Faturamento Real por KG (R$/kg fat.)</div>
+        <div class="cc-sub">Faturamento real &#xF7; KG processado por processo &middot; roxo = alto valor &middot; azul = m&#xE9;dio &middot; verde = baixo valor/kg</div>
+        <div style="position:relative;height:220px"><canvas id="ins-margin-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- EVOLUCAO FATURAMENTO + SAZONALIDADE -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- EVOLUCAO ANUAL TOP CLIENTES -->
+      <div class="cc">
+        <div class="cc-title">&#x1F4CA; Evolu&#xE7;&#xE3;o do Faturamento &mdash; Top 6 Clientes (2023&#x2013;2026)</div>
+        <div class="cc-sub">Faturamento real das bases &middot; 2026 YTD parcial</div>
+        <div style="position:relative;height:230px"><canvas id="ins-evol-chart"></canvas></div>
+      </div>
+
+      <!-- CATEGORIAS DE LAVAGEM -->
+      <div class="cc">
+        <div class="cc-title">&#x1F9F5; Faturamento por Categoria de Lavagem</div>
+        <div class="cc-sub">Distribui&#xE7;&#xE3;o do faturamento real total por tipo de processo</div>
+        <div style="position:relative;height:230px"><canvas id="ins-cat-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABELA WATCHLIST -->
+    <div class="cc">
+      <div class="cc-title">&#x1F6A8; Watchlist &mdash; Clientes e Processos que Precisam de Aten&#xE7;&#xE3;o</div>
+      <div class="cc-sub">Gerado automaticamente com base nos dados reais das bases &middot; clicar para ver detalhe</div>
+      <div id="ins-watchlist"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ABA CUSTOS & MARGEM REAL -->
+<div class="tab-pane" id="pane-custos">
+  <div class="todos-bar" style="flex-wrap:wrap;gap:8px">
+    <select class="sort-sel" id="cm-year" onchange="renderCustos()">
+      <option value="2026">Ano: 2026</option>
+      <option value="2025">Ano: 2025</option>
+      <option value="2024">Ano: 2024</option>
+      <option value="2023">Ano: 2023</option>
+    </select>
+    <select class="sort-sel" id="cm-cat" onchange="renderCustos()">
+      <option value="">Todas as categorias</option>
+      <option value="Lavanderia">Lavanderia</option>
+      <option value="Tinturaria">Tinturaria</option>
+    </select>
+    <span id="cm-count" style="font-size:10px;color:var(--text3)"></span>
+    <span style="font-size:10px;color:var(--green)">&#x2705; PV real = BASE.23.25+BASE.26 (fat/kg) &middot; Custo = Processos de Lavagem 2023-2026 (insumos+&#xE1;gua)</span>
+  </div>
+
+  <!-- AVISO METODOLOGIA -->
+  <div style="margin:10px 20px 0;padding:10px 14px;background:rgba(154,90,8,.07);border-left:3px solid var(--amber);border-radius:6px;font-size:11px;color:var(--text2)">
+    <b>&#x26A0;&#xFE0F; Sobre o custo:</b> Os valores de custo s&#xE3;o de <b>insumos + &#xE1;gua/banho</b> (extra&#xED;dos das planilhas Processos de Lavagem 2023-2026).
+    <b>N&#xE3;o incluem</b> m&#xE3;o de obra, energia, deprecia&#xE7;&#xE3;o nem overhead. A margem exibida &#xE9; a margem sobre <i>custo de mat&#xE9;ria-prima</i>, n&#xE3;o a margem operacional total.
+    &middot; Para Lavanderia: custo = insumos (R$/kg). Para Tinturaria: custo = insumos + &#xE1;gua = CUSTO FINAL da planilha (R$/kg).
+    &middot; PV m&#xE9;dio = faturamento real (Valor Faturado BASE) &#xF7; KG processado.
+  </div>
+
+  <!-- KPI RESUMO -->
+  <div id="cm-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 20px 0"></div>
+
+  <!-- GRAFICO COMPARATIVO -->
+  <div style="padding:12px 20px 0">
+    <div class="cc">
+      <div class="cc-title">&#x1F4CA; PV Real vs Custo de Insumos (R$/kg) &mdash; <span id="cm-chart-year">2026</span></div>
+      <div class="cc-sub">Barras azuis = PV m&#xE9;dio faturado (BASE) &middot; Barras laranjas = Custo de insumos (Processos de Lavagem)</div>
+      <div style="position:relative;height:260px"><canvas id="cm-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- EVOLUCAO CUSTO HISTORICO -->
+  <div style="padding:8px 20px 0;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div class="cc">
+      <div class="cc-title">&#x1F4C8; Evolu&#xE7;&#xE3;o do Custo de Insumos 2023&#x2013;2026</div>
+      <div class="cc-sub">Processos com custo mapeado em todos os anos</div>
+      <div style="position:relative;height:220px"><canvas id="cm-evol-chart"></canvas></div>
+    </div>
+    <div class="cc">
+      <div class="cc-title">&#x1F4CA; Margem Bruta (PV &minus; Custo Insumos) por Processo</div>
+      <div class="cc-sub">Ordenado por margem decrescente &middot; <span id="cm-year2">2026</span></div>
+      <div style="position:relative;height:220px"><canvas id="cm-mg-chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABELA DETALHADA -->
+  <div style="overflow-x:auto;padding:12px 20px 30px">
+    <table style="width:100%;border-collapse:collapse;font-size:11px">
+      <thead><tr style="background:var(--bg3)">
+        <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border2)">Processo</th>
+        <th style="padding:8px 8px;text-align:left;border-bottom:2px solid var(--border2)">Categoria</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--purple)">PV Real (R$/kg)</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--amber)">Custo Insumos (R$/kg)</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--green)">Margem Bruta</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2)">Margem %</th>
+        <th style="padding:8px 8px;text-align:right;border-bottom:2px solid var(--border2)">Fat. Real</th>
+        <th style="padding:8px 12px;text-align:left;border-bottom:2px solid var(--border2)">Custo ref. hist&#xF3;rico</th>
+      </tr></thead>
+      <tbody id="cm-body"></tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ABA MARGEM REAL -->
+<div class="tab-pane" id="pane-margem">
+  <div style="padding:14px 20px 30px">
+
+    <!-- NOTA METODOLOGICA -->
+    <div style="background:rgba(26,95,168,.07);border-left:3px solid var(--blue);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:11px;line-height:1.6">
+      <b style="color:var(--blue)">&#x2139;&#xFE0F; Metodologia de custo</b><br>
+      <b>TINTURARIA:</b> Custo total (insumos + &#xE1;gua + custo/minuto) extra&#xED;do do <b>HIST&#xD3;RICO</b> dos arquivos Processos de Lavagem 2025 e 2026 &#x2014; valores calculados pela planilha por intensidade (Claro 1% / M&#xE9;dio 3% / Escuro 6% / Intenso &lt;10%).<br>
+      <b>LAVANDERIA:</b> Custo de <b>insumos apenas</b> (mat&#xE9;ria-prima, excluindo &#xE1;gua e custo/minuto) &#x2014; custo completo requer inclus&#xE3;o do custo/minuto: 2025 = R$0,0211/min | 2026 = R$0,0225/min.<br>
+      <b>PV Real:</b> Faturamento real &#xF7; KG processado (BASE.23.25 + BASE.26) &#x2014; pre&#xE7;o efetivamente cobrado dos clientes.
+    </div>
+
+    <!-- KPIs MARGEM -->
+    <div id="mg-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px"></div>
+
+    <!-- CHART MARGEM TINTURARIA -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="cc">
+        <div class="cc-title">&#x1F9EA; Tinturaria: PV Real vs Custo de Produ&#xE7;&#xE3;o (R$/kg)</div>
+        <div class="cc-sub">Custo = total (insumos + &#xE1;gua + tempo) por intensidade m&#xE9;dia &#x2014; PV = fat. real / kg (BASE files)</div>
+        <div style="position:relative;height:260px"><canvas id="mg-tint-chart"></canvas></div>
+      </div>
+      <div class="cc">
+        <div class="cc-title">&#x1F9FA; Lavanderia: PV Real vs Custo Insumos (R$/kg)</div>
+        <div class="cc-sub">Custo = insumos apenas &#x2014; PV = fat. real / kg &#x2014; Margem real &#xE9; maior ap&#xF3;s subtrair custo/minuto</div>
+        <div style="position:relative;height:260px"><canvas id="mg-lav-chart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TABELA COMPLETA -->
+    <div class="cc">
+      <div class="cc-title">&#x1F4CB; Tabela de Margem Real por Processo (2025 vs 2026)</div>
+      <div class="cc-sub">Ordenar por: <span id="mg-sort-bar" style="display:inline-flex;gap:6px;margin-left:8px"></span></div>
+      <div style="overflow-x:auto;margin-top:8px">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="background:var(--bg3)">
+            <th style="padding:7px 10px;text-align:left;border-bottom:2px solid var(--border2)">Processo</th>
+            <th style="padding:7px 6px;text-align:center;border-bottom:2px solid var(--border2)">Tipo</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--purple)">PV Real (R$/kg)</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y24)">Custo 2025 (R$/kg)</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--green)">Margem 2025</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--y26)">Custo 2026 (R$/kg)</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2);color:var(--green)">Margem 2026</th>
+            <th style="padding:7px 8px;text-align:right;border-bottom:2px solid var(--border2)">Var. Custo</th>
+            <th style="padding:7px 10px;text-align:left;border-bottom:2px solid var(--border2)">Nota</th>
+          </tr></thead>
+          <tbody id="mg-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
